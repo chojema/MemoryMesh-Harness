@@ -10,10 +10,11 @@ Apply the steps below from the project root. Preserve existing project content, 
 2. Do not overwrite user-authored content.
 3. Create missing items and update only clearly marked MemoryMesh-managed blocks.
 4. Keep MemoryMesh control and continuity records inside `.mesh/`.
-5. Use Graphify for project-wide knowledge graph and generated Markdown Wiki output.
-6. Keep work history and generated project knowledge separate.
-7. Reapplying this setup in the same folder must be safe.
-8. Report actual conflicts, blockers, and preserved user content.
+5. Treat `.mesh/` as the only cross-agent work record location; do not use any agent private or internal store for project work continuity.
+6. Use Graphify for project-wide knowledge graph and generated Markdown Wiki output.
+7. Keep work history and generated project knowledge separate.
+8. Reapplying this setup in the same folder must be safe.
+9. Report actual conflicts, blockers, and preserved user content.
 
 ---
 
@@ -42,6 +43,7 @@ handoffs/
 archive/
 cold/
 reports/
+scripts/
 ```
 
 Detect when possible:
@@ -83,20 +85,21 @@ Create only missing directories.
 ├─ handoffs/
 ├─ archive/
 ├─ cold/
-└─ reports/
+├─ reports/
+└─ scripts/
 ```
 
 POSIX shell:
 
 ```bash
-mkdir -p .mesh/handoffs .mesh/archive .mesh/cold .mesh/reports
+mkdir -p .mesh/handoffs .mesh/archive .mesh/cold .mesh/reports .mesh/scripts
 ```
 
 PowerShell:
 
 ```powershell
 New-Item -ItemType Directory -Force -Path `
-  .mesh, .mesh/handoffs, .mesh/archive, .mesh/cold, .mesh/reports
+  .mesh, .mesh/handoffs, .mesh/archive, .mesh/cold, .mesh/reports, .mesh/scripts
 ```
 
 Graphify output is generated later under `graphify-out/` when the user runs the Graphify assistant skill. Do not create or populate `graphify-out/` during setup.
@@ -121,6 +124,8 @@ MemoryMesh preserves work across sessions, context limits, and agent changes. Gr
 - MemoryMesh protocol, continuity, logs, handoffs, and indexes: `.mesh/`
 - Generated project knowledge graph, report, visualization, and Wiki: `graphify-out/`
 - Project source of truth: the actual project files outside `.mesh/` and `graphify-out/`
+
+Work status, checkpoints, and handoffs must be recorded in `.mesh/` regardless of agent type. Do not use any agent private or internal store for project work continuity, including Claude Code memory, Codex session state, or any equivalent assistant-specific storage. `.mesh/` is the only cross-agent work record location.
 
 Do not use `graphify-out/` as a work log. Do not write MemoryMesh handoff records into Graphify output.
 
@@ -221,6 +226,40 @@ When a graph exists:
 4. Treat graph relationships and generated Wiki text as derived analysis that may contain omissions or incorrect inference.
 5. Do not edit generated Graphify files as a substitute for changing the actual project source.
 6. Do not copy work logs or handoff notes into the Graphify Wiki.
+
+## Graphify assistant registration
+
+Graphify registration is project-scoped and all-agent by default. Use one project registration script from the project root so agents do not need separate manual setup runs.
+
+The setup-created command is:
+
+```bash
+.mesh/scripts/install-graphify-agents.sh
+```
+
+This script runs the native Graphify all-agent project registration command first:
+
+```bash
+graphify install --project
+```
+
+Use this as the primary path because it is maintained by Graphify and can include newly supported agents without MemoryMesh hard-coding every platform. If the installed Graphify version does not support `--project`, the script falls back to documented per-platform registrations.
+
+Some platform registrations only create project or user instruction files for that agent. The agent application or CLI does not always need to be installed at setup time. If one platform registration fails, keep successful registrations, record the failed platform as an exact blocker, and explain that the user can rerun the script after preparing that platform.
+
+Keep `AGENTS.md` as the common entrypoint for all agents. Dedicated hooks or skills may improve integration, but agents without a dedicated Graphify hook must still receive the Graphify and MemoryMesh instructions through `AGENTS.md`.
+
+Fallback per-platform registrations are:
+
+```bash
+graphify install --platform claude       # Claude Code
+graphify install --platform codex        # Codex
+graphify install --platform opencode     # OpenCode
+graphify install --platform agents       # Agents-compatible assistant
+graphify install --platform antigravity  # Antigravity
+```
+
+When a new agent is supported but not covered by `graphify install --project`, add exactly one labeled fallback registration command to `.mesh/scripts/install-graphify-agents.sh` and document it in this section. Do not scatter agent-specific registration instructions across unrelated project files.
 
 ## Graph freshness
 
@@ -400,6 +439,8 @@ None.
 ## Graphify
 - CLI: installation pending verification
 - Assistant skill: pending verification
+- Registration script: `.mesh/scripts/install-graphify-agents.sh`
+- All-agent registration: pending verification
 - Graph status: not generated
 - Wiki status: not generated
 - Output: `graphify-out/`
@@ -444,7 +485,7 @@ None.
 ## Integrations
 | Tool | Version | Scope | Status | Notes |
 |---|---|---|---|---|
-| Graphify | pending | user | pending | Assistant skill not yet verified |
+| Graphify | pending | project | pending | All-agent registration script not yet verified |
 ```
 
 ---
@@ -459,6 +500,10 @@ Use this managed block:
 <!-- MEMORYMESH:START -->
 ## MemoryMesh
 This project uses `.mesh/` for work continuity and Graphify for generated project-wide knowledge.
+
+`AGENTS.md` is the common entrypoint for all agents. Agents without a dedicated Graphify hook or skill still use these instructions.
+
+`.mesh/` is the only cross-agent work record location. Do not use Claude Code memory, Codex session state, or any other agent private/internal store for project work continuity.
 
 Before changing project files, read `.mesh/PROTOCOL.md`, `.mesh/OVERVIEW.md`, and the recent tail of `.mesh/work.log`.
 
@@ -490,6 +535,8 @@ Read `AGENTS.md` and `.mesh/PROTOCOL.md` before changing project files.
 ```
 
 ### `GEMINI.md`
+
+Keep this file for Antigravity and other Google/Gemini-family tools that read Gemini-style instruction files. Do not treat this as a Gemini CLI registration step.
 
 Use:
 
@@ -560,36 +607,87 @@ If Python 3.10 or newer, a supported installer, network access, or permission is
 2. complete every other MemoryMesh step;
 3. report Graphify as the only incomplete component.
 
-### 6.2 Register Graphify for the active assistant harness
+### 6.2 Create and run the project registration script
 
-Register Graphify as a user-level assistant skill for the active AI coding harness only.
+Register Graphify at the project level for all currently known AI coding agents in one run. Do not require the user or the current agent to run separate commands for Claude Code, Codex, OpenCode, Antigravity, or other known platforms.
 
-Do not install all platforms. Do not use project-scoped `--project` registration unless the user explicitly requested a project-local skill installation.
-
-Use the installed Graphify CLI help as the final authority because command syntax may change between versions.
-
-Current command patterns include:
+Create or update `.mesh/scripts/install-graphify-agents.sh` with this managed script:
 
 ```bash
-graphify install
-graphify install --platform codex
-graphify install --platform opencode
-graphify install --platform gemini
-graphify install --platform agents
-graphify antigravity install
+#!/usr/bin/env bash
+set -u
+
+if ! command -v graphify >/dev/null 2>&1; then
+  echo "BLOCKER: graphify command not found" >&2
+  exit 1
+fi
+
+failed=0
+succeeded=""
+failed_labels=""
+
+run_registration() {
+  label="$1"
+  shift
+  echo "==> ${label}: $*"
+  if "$@"; then
+    echo "OK: ${label}"
+    succeeded="${succeeded}${label}; "
+  else
+    status=$?
+    echo "WARN: ${label} registration failed with exit code ${status}" >&2
+    failed=1
+    failed_labels="${failed_labels}${label}(${status}); "
+  fi
+}
+
+if graphify install --help 2>&1 | grep -q -- '--project'; then
+  run_registration "Graphify all-agent project registration" graphify install --project
+else
+  echo "WARN: graphify install --project is unavailable; using fallback per-platform registrations" >&2
+  run_registration "Claude Code" graphify install --platform claude
+  run_registration "Codex" graphify install --platform codex
+  run_registration "OpenCode" graphify install --platform opencode
+  run_registration "Agents-compatible assistant" graphify install --platform agents
+  run_registration "Antigravity" graphify install --platform antigravity
+fi
+
+echo "SUMMARY: registered=${succeeded:-none}"
+if [ "${failed}" -ne 0 ]; then
+  echo "SUMMARY: failed=${failed_labels}" >&2
+  echo "Some platform registrations failed. Successful registrations remain in place; rerun this script after resolving the listed platform blockers." >&2
+fi
+
+exit "${failed}"
 ```
 
-Use the one that matches the active harness.
+Make it executable when the platform supports POSIX permissions:
 
-Examples:
+```bash
+chmod +x .mesh/scripts/install-graphify-agents.sh
+```
 
-- Claude Code or a generic slash-command assistant: `graphify install`
+Run exactly one project registration command from the project root:
+
+```bash
+.mesh/scripts/install-graphify-agents.sh
+```
+
+The script uses `graphify install --project` as the primary path. That command is the universal Graphify project registration point and should work no matter which supported agent applied the MemoryMesh setup first. A project initialized from Codex can later be opened from Claude Code, Antigravity, OpenCode, or another supported agent; the reverse direction should work the same way as long as the all-agent registration succeeded.
+
+Some platform registrations create project or user instruction files and do not require the corresponding agent app or CLI to be installed at setup time. If `graphify install --project` is unavailable, the script falls back to per-platform registrations. If a fallback platform registration fails, the script keeps successful registrations, prints a summary, exits nonzero, and the setup must record only the failed platform as a blocker.
+
+Fallback per-platform registration methods are documented in `.mesh/PROTOCOL.md` and must match the script:
+
+- Claude Code: `graphify install --platform claude`
 - Codex: `graphify install --platform codex`
 - OpenCode: `graphify install --platform opencode`
-- Gemini CLI: `graphify install --platform gemini`
-- Antigravity: `graphify antigravity install`
+- Agents-compatible assistant: `graphify install --platform agents`
+- Antigravity: `graphify install --platform antigravity`
 
-After registration, verify that the installed instructions describe assistant-skill usage, not headless API extraction as the default path.
+For a new agent, first rely on an updated Graphify package and `graphify install --project`. Only add a new fallback line to `.mesh/scripts/install-graphify-agents.sh` and `.mesh/PROTOCOL.md` when the native project installer does not cover that agent. Keep `AGENTS.md` as the common entrypoint for all agents so tools without a dedicated hook or skill still receive the Graphify usage instructions.
+
+After registration, verify that installed instructions describe assistant-skill usage, not headless API extraction as the default graph build path. Report each registration that failed and each registration that succeeded. Do not claim all-agent setup success unless the script completed successfully. When failures remain, state that MemoryMesh setup is complete except for the listed Graphify platform registrations.
 
 ### 6.3 Create or update `.graphifyignore`
 
@@ -618,15 +716,16 @@ Append one event to `.mesh/work.log`:
 Tool: Graphify
 Package: graphifyy
 Version: <verified version>
-Scope: user
-Active harness: <detected and configured harness>
+Scope: project
+Registration script: .mesh/scripts/install-graphify-agents.sh
+Registered agents: all supported Graphify project registrations, or exact blockers
 Changed files: <paths>
 Initial graph: not generated
 Initial Wiki: not generated
 Status: <complete or exact blocker>
 ```
 
-Update the Graphify row in `.mesh/INDEX.md` with the verified version, scope, and status.
+Update the Graphify row in `.mesh/INDEX.md` with the verified version, project scope, registration script, and all-agent registration status.
 
 Update the Graphify section in `.mesh/OVERVIEW.md`.
 
@@ -644,7 +743,7 @@ Vendor: <vendor or unknown>
 Harness: <harness or unknown>
 Capabilities: <known capabilities>
 Context-window: <known value or unknown>
-Summary: MemoryMesh continuity initialized and Graphify assistant skill configured.
+Summary: MemoryMesh continuity initialized and Graphify project registration script configured.
 Graphify: <complete or exact blocker>
 Graph and Wiki: not generated
 Preserved: <existing files>
@@ -679,6 +778,8 @@ Verify that these items exist:
 .mesh/archive/
 .mesh/cold/
 .mesh/reports/
+.mesh/scripts/
+.mesh/scripts/install-graphify-agents.sh
 AGENTS.md
 CLAUDE.md
 GEMINI.md
@@ -690,7 +791,9 @@ Also verify:
 - MemoryMesh managed blocks remain intact;
 - existing user-authored instructions were preserved;
 - `graphify --version` succeeds, unless an exact blocker was recorded;
-- Graphify was registered for the active assistant harness;
+- `.mesh/scripts/install-graphify-agents.sh` exists and is executable where POSIX permissions apply;
+- Graphify was registered for all currently known assistant harnesses, or exact blockers were recorded;
+- `AGENTS.md` remains the common entrypoint for agents without dedicated Graphify hooks or skills;
 - `graphify-out/` was not created merely by setup.
 
 Do not claim success for an unverified component.
@@ -704,16 +807,16 @@ Keep the final report concise.
 State:
 
 - MemoryMesh setup completion;
-- Graphify version and active harness registration status;
+- Graphify version and all-agent project registration status;
 - preserved conflicts or actual blockers;
 - whether the current AI coding assistant should be restarted;
-- the Graphify assistant command to run after restart.
+- the single project registration command and the Graphify assistant command to run after restart.
 
 Do not tell the user to run terminal `graphify . --wiki` for the initial graph build.
 
 Use the active assistant command.
 
-For Claude Code, Gemini CLI, OpenCode, Antigravity, or a compatible slash-command assistant:
+For Claude Code, OpenCode, Antigravity, or a compatible slash-command assistant:
 
 ```text
 /graphify . --wiki
