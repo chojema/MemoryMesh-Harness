@@ -695,8 +695,15 @@ Preserve existing patterns and create or update only this managed block:
 
 ```gitignore
 # MEMORYMESH-GRAPHIFY:START
+.agents/
+.claude/
+.codex/
+.git/
 .mesh/
 graphify-out/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
 memorymesh-setup.md
 # MEMORYMESH-GRAPHIFY:END
 ```
