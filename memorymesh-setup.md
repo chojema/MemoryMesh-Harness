@@ -1,137 +1,158 @@
 # MemoryMesh Setup
 
-Set up this folder as a MemoryMesh shared workspace for AI coding agents.
+이 문서는 현재 폴더를 AI 코딩 에이전트가 함께 사용할 수 있는 MemoryMesh 작업 공간으로 설정하기 위한 실행 지침입니다.
 
-Apply the steps below from the project root. Preserve existing project content, create or update the MemoryMesh continuity structure, and install Graphify as a user-level assistant skill for the active AI coding harness. MemoryMesh setup does not build the project graph. The initial graph must be generated later from inside the active AI coding assistant with the Graphify skill command.
+프로젝트 최상위 폴더에서 아래 절차를 적용합니다. 기존 프로젝트 내용과 업무 일지를 보존하고, 작업 연속성에 필요한 최소한의 파일만 생성하거나 갱신합니다.
 
-## Core rules
+## 기본 원칙
 
-1. Preserve existing files and directories.
-2. Do not overwrite user-authored content.
-3. Create missing items and update only clearly marked MemoryMesh-managed blocks.
-4. Keep MemoryMesh control and continuity records inside `.mesh/`.
-5. Treat `.mesh/` as the only cross-agent work record location; do not use any agent private or internal store for project work continuity.
-6. Use Graphify for project-wide knowledge graph and generated Markdown Wiki output.
-7. Keep work history and generated project knowledge separate.
-8. Reapplying this setup in the same folder must be safe.
-9. Report actual conflicts, blockers, and preserved user content.
+1. 기존 파일과 폴더를 보존합니다.
+2. 사용자가 작성한 내용을 덮어쓰지 않습니다.
+3. 명확하게 표시된 MemoryMesh 관리 블록만 갱신합니다.
+4. 기존 업무 일지가 있으면 그 파일을 기준 기록으로 사용합니다.
+5. 같은 작업 내용을 여러 일지에 중복 기록하지 않습니다.
+6. 현재 상태는 `.mesh/STATE.md`, 시간순 이력은 설정된 업무 일지에 기록합니다.
+7. 실제 소스 파일과 문서를 프로젝트의 최종 기준으로 봅니다.
+8. 질문과 상태 확인은 읽기 전용으로 처리합니다.
+9. 같은 폴더에 다시 적용해도 기존 기록과 사용자 내용을 보존해야 합니다.
+10. 확인한 충돌, 보존한 내용과 완료하지 못한 항목을 정확하게 보고합니다.
 
 ---
 
-## 1. Inspect the current state
+## 1. 현재 상태 확인
 
-Inspect the project root before changing anything.
+변경하기 전에 프로젝트 최상위 폴더와 기존 지침을 확인합니다.
 
-Check for:
+다음 항목의 존재 여부를 확인합니다.
 
 ```text
 .mesh/
-.graphifyignore
 AGENTS.md
 CLAUDE.md
 GEMINI.md
 ```
 
-Inside `.mesh/`, check for:
+`.mesh/`가 있으면 다음 파일을 우선 확인합니다.
 
 ```text
+CONFIG.md
 PROTOCOL.md
-OVERVIEW.md
+STATE.md
 work.log
-INDEX.md
 handoffs/
-archive/
-cold/
-reports/
-scripts/
 ```
 
-Detect when possible:
+프로젝트 안에서 기존 업무 일지를 찾습니다. 다음 조건을 만족하는 파일을 강한 후보로 봅니다.
 
-- operating system and shell;
-- active AI coding harness;
-- Python version;
-- availability of `uv` and `pipx`;
-- existing Graphify installation and version.
+- 사용자가 적용 요청에서 업무 일지라고 명시한 파일
+- `.mesh/CONFIG.md`에 이미 지정된 파일
+- 제목이나 본문에서 업무 일지, 작업 일지, 진행 기록 또는 work log임을 명확히 밝힌 파일
+- 최근 작업, 변경 파일, 결정과 다음 행동을 시간순으로 기록한 파일
 
-Use these checks when available:
+`CHANGELOG`, 릴리스 노트와 Git 기록만으로는 업무 일지라고 단정하지 않습니다.
 
-```bash
-graphify --version
-python --version
-python3 --version
-py -3 --version
-uv --version
-pipx --version
-```
+업무 일지는 다음 순서로 선택합니다.
 
-Classify the state as:
+1. `.mesh/CONFIG.md`에 지정된 유효한 경로
+2. 사용자가 적용 요청에서 명시한 경로
+3. 하나만 확인된 명확한 기존 업무 일지
+4. 기존 업무 일지가 없을 때 생성하는 `.mesh/work.log`
 
-- `first install` when no usable MemoryMesh structure exists;
-- `re-engagement` when an existing MemoryMesh structure is found.
+후보가 여러 개이고 기준 기록을 판단할 근거가 없으면 임의로 선택하거나 새 일지를 만들지 않습니다. 사용자에게 사용할 경로를 확인한 뒤 계속합니다.
+
+다음 기준으로 설치 상태를 구분합니다.
+
+- `first install`: 사용할 수 있는 MemoryMesh 구조가 없는 경우
+- `re-engagement`: 기존 MemoryMesh 구조가 확인된 경우
 
 ---
 
-## 2. Create the MemoryMesh structure
+## 2. 최소 구조 만들기
 
-Create only missing directories.
+`.mesh/`가 없으면 생성합니다. 기본 설치에서는 하위 폴더를 미리 만들지 않습니다.
 
 ```text
 .mesh/
+├─ CONFIG.md
 ├─ PROTOCOL.md
-├─ OVERVIEW.md
-├─ work.log
-├─ INDEX.md
-├─ handoffs/
-├─ archive/
-├─ cold/
-├─ reports/
-└─ scripts/
+└─ STATE.md
 ```
 
-POSIX shell:
+기존 업무 일지가 없을 때만 다음 파일을 추가합니다.
+
+```text
+.mesh/work.log
+```
+
+다른 세션이나 에이전트에 상세 작업을 넘길 때만 다음 폴더를 만듭니다.
+
+```text
+.mesh/handoffs/
+```
+
+POSIX 셸에서는 다음 명령으로 기본 폴더를 만들 수 있습니다.
 
 ```bash
-mkdir -p .mesh/handoffs .mesh/archive .mesh/cold .mesh/reports .mesh/scripts
+mkdir -p .mesh
 ```
 
-PowerShell:
+PowerShell에서는 다음 명령을 사용할 수 있습니다.
 
 ```powershell
-New-Item -ItemType Directory -Force -Path `
-  .mesh, .mesh/handoffs, .mesh/archive, .mesh/cold, .mesh/reports, .mesh/scripts
+New-Item -ItemType Directory -Force -Path .mesh
 ```
-
-Graphify output is generated later under `graphify-out/` when the user runs the Graphify assistant skill. Do not create or populate `graphify-out/` during setup.
 
 ---
 
-## 3. Create or update `.mesh/PROTOCOL.md`
+## 3. `.mesh/CONFIG.md` 생성 또는 갱신
 
-- If the file is absent, create it with the title and managed block below.
-- If the managed block exists, replace only the content inside the block.
-- If the file exists without the block, preserve it and append the block.
-- Preserve and report direct conflicts.
+- 파일이 없으면 아래 제목과 관리 블록으로 만듭니다.
+- 관리 블록이 있으면 블록 안의 내용만 갱신합니다.
+- 파일은 있지만 관리 블록이 없으면 기존 내용을 보존하고 블록을 덧붙입니다.
+- `work_log`에는 프로젝트 최상위 폴더를 기준으로 한 상대 경로를 기록합니다.
+- 기존 업무 일지를 사용하면 `work_log_owner`를 `existing`으로 기록합니다.
+- `.mesh/work.log`를 새로 만들면 `work_log_owner`를 `memorymesh`로 기록합니다.
+
+```markdown
+# MemoryMesh Configuration
+
+<!-- MEMORYMESH:CONFIG:START -->
+work_log: <relative-path>
+work_log_owner: <existing-or-memorymesh>
+state_file: .mesh/STATE.md
+handoff_directory: .mesh/handoffs
+<!-- MEMORYMESH:CONFIG:END -->
+```
+
+설정된 업무 일지 경로가 실제로 존재하는지 확인합니다.
+
+---
+
+## 4. `.mesh/PROTOCOL.md` 생성 또는 갱신
+
+- 파일이 없으면 아래 제목과 관리 블록으로 만듭니다.
+- 관리 블록이 있으면 블록 안의 내용만 갱신합니다.
+- 파일은 있지만 관리 블록이 없으면 기존 내용을 보존하고 블록을 덧붙입니다.
+- 직접 충돌하는 기존 지침은 삭제하지 않고 완료 보고에 표시합니다.
 
 ````markdown
 # MemoryMesh Protocol
 
 <!-- MEMORYMESH:PROTOCOL:START -->
-MemoryMesh preserves work across sessions, context limits, and agent changes. Graphify supplies the project-wide knowledge graph and generated Markdown Wiki after the user runs the Graphify assistant skill.
+MemoryMesh preserves project work across sessions, context limits, and agent changes by using a configured work log and a concise current-state file.
 
-## Locations
+## Sources of truth
 
-- MemoryMesh protocol, continuity, logs, handoffs, and indexes: `.mesh/`
-- Generated project knowledge graph, report, visualization, and Wiki: `graphify-out/`
-- Project source of truth: the actual project files outside `.mesh/` and `graphify-out/`
+- Project source of truth: the actual project files and documents.
+- Chronological work record: the file configured as `work_log` in `.mesh/CONFIG.md`.
+- Current project state: `.mesh/STATE.md`.
+- Detailed transfer notes, when needed: `.mesh/handoffs/`.
 
-Work status, checkpoints, and handoffs must be recorded in `.mesh/` regardless of agent type. Do not use any agent private or internal store for project work continuity, including Claude Code memory, Codex session state, or any equivalent assistant-specific storage. `.mesh/` is the only cross-agent work record location.
-
-Do not use `graphify-out/` as a work log. Do not write MemoryMesh handoff records into Graphify output.
+Do not use an agent-private memory store as the only record of project work. Do not duplicate the same chronological entry in multiple logs.
 
 ## Request classification
 
-Classify the request before reading or changing files.
+Classify the request before changing files.
 
 ### Query mode
 
@@ -140,393 +161,188 @@ Use Query mode for information, status, progress, summaries, opinions, evaluatio
 - Read only what is needed.
 - Answer and stop.
 - Do not change files.
-- Do not append logs.
-- Do not install or run tools.
-- Do not begin a next task unless the user explicitly requests it.
+- Do not append to the work log.
+- Do not begin another task without an explicit request.
 
-### Status and opinion rule
-
-When the user asks about status, progress, opinion, or evaluation, report observed facts or the requested assessment and stop.
-
-### Question and command boundary
-
-An interrogative is a question. A verb inside a question is not an instruction. Only an imperative or explicit approval authorizes a change.
-
-For example, “Is file A deleted?” asks for an existence check. It does not authorize deleting file A.
-
-### Read and change boundary
-
-Necessary reads require no permission.
-
-The following are changes and require an explicit command:
-
-- create, edit, delete, move, rename, or overwrite files;
-- execute programs or scripts;
-- install packages;
-- change configuration;
-- generate Graphify output.
-
-Applying `memorymesh-setup.md` explicitly authorizes the setup steps in that file.
+An interrogative is a question. A verb inside a question is not an instruction. For example, “Is file A deleted?” authorizes an existence check, not deletion.
 
 ### Task mode
 
-Use Task mode when the user explicitly requests creation, modification, deletion, movement, execution, installation, configuration, or generation.
+Use Task mode only when the user explicitly requests creation, modification, deletion, movement, execution, configuration, or record updates.
 
 Before changing project files:
 
 1. Read `.mesh/PROTOCOL.md`.
-2. Read `.mesh/OVERVIEW.md`.
-3. Read the recent tail of `.mesh/work.log`.
-4. If resuming or taking over work, inspect relevant files in `.mesh/handoffs/` and `.mesh/INDEX.md`.
-5. When `graphify-out/graph.json` exists, use a scoped Graphify query or the generated Wiki before broad raw-file searches.
-6. Read source files needed to verify Graphify findings before making consequential changes.
+2. Read `.mesh/CONFIG.md`.
+3. Read `.mesh/STATE.md`.
+4. Read the recent part of the configured work log.
+5. When resuming transferred work, read the relevant file in `.mesh/handoffs/`.
+6. Read the original project files required for the task.
 
-`.mesh` is a hidden folder. If search tools skip it, read the required paths directly.
+`.mesh` is a hidden folder. Read the required paths directly when a search tool skips hidden content.
 
-## Graphify knowledge layer
+## Work log
 
-Graphify is the project-wide generated knowledge layer. It must be invoked from inside the active AI coding assistant as a skill command.
+Treat the configured work log as the only chronological cross-agent work record.
 
-Do not run the terminal CLI form `graphify .` as the default way to build the graph. The terminal CLI may use headless extraction backends and can require API keys.
+- Preserve its existing format and writing style.
+- Append new entries; do not rewrite established history.
+- Record meaningful work, changed files, decisions, blockers, and remaining actions.
+- Correct an earlier entry with a new correction note instead of silently changing history.
+- Do not record routine file reads or insignificant actions.
 
-Use the active assistant’s skill command:
-
-```text
-/graphify . --wiki
-```
-
-For Codex:
+When MemoryMesh owns `.mesh/work.log`, use this compact entry format:
 
 ```text
-$graphify . --wiki
+### YYYY-MM-DD HH:MM | <agent-or-model> | <event>
+Summary: <what changed or was decided>
+Files: <changed paths or none>
+Next: <next action or none>
+Risks: <known uncertainty or none>
 ```
 
-The expected output is:
+Useful event names are `SETUP`, `WORK_START`, `WORK_END`, `DECISION`, `CHECKPOINT`, `HANDOFF`, `BLOCKER`, and `CORRECTION`. Use another clear name when it describes the event better.
+
+## Current state
+
+Keep `.mesh/STATE.md` brief and current. Update it only when the project goal, current work, recent material changes, settled decisions, next action, open handoffs, or risks change.
+
+Do not copy the full work log into the state file. Replace outdated state text instead of accumulating a second chronological history.
+
+## Handoffs
+
+For a simple continuation, update the work log and `.mesh/STATE.md`; no separate handoff file is needed.
+
+Create `.mesh/handoffs/` and a handoff file only when another session or agent needs details that do not fit in the current-state summary. Name it:
 
 ```text
-graphify-out/
-├─ graph.html
-├─ GRAPH_REPORT.md
-├─ graph.json
-└─ wiki/
+.mesh/handoffs/handoff_<topic>.<from-agent>.md
 ```
 
-Use the outputs as follows:
+Include the work summary, changed files, decisions, current state, remaining work, known risks, and exact next action. Record the handoff in the configured work log and link it from `.mesh/STATE.md`.
 
-- `GRAPH_REPORT.md`: project-wide overview, important nodes, communities, and suggested questions;
-- `graph.json`: structured graph for queries and paths;
-- `graph.html`: browser-based visual exploration;
-- `wiki/index.md`: entry point to the generated Markdown Wiki.
+## External changes
 
-When a graph exists:
-
-1. Start with a scoped Graphify query, path, or explain request when the question is specific.
-2. Use `GRAPH_REPORT.md` or `wiki/index.md` for project-wide orientation.
-3. Read the relevant original project files before modifying code, configuration, or documents.
-4. Treat graph relationships and generated Wiki text as derived analysis that may contain omissions or incorrect inference.
-5. Do not edit generated Graphify files as a substitute for changing the actual project source.
-6. Do not copy work logs or handoff notes into the Graphify Wiki.
-
-## Graphify assistant registration
-
-Graphify registration is project-scoped and all-agent by default. Use one project registration script from the project root so agents do not need separate manual setup runs.
-
-The setup-created command is:
-
-```bash
-.mesh/scripts/install-graphify-agents.sh
-```
-
-This script runs the native Graphify all-agent project registration command first:
-
-```bash
-graphify install --project
-```
-
-Use this as the primary path because it is maintained by Graphify and can include newly supported agents without MemoryMesh hard-coding every platform. If the installed Graphify version does not support `--project`, the script falls back to documented per-platform registrations.
-
-Some platform registrations only create project or user instruction files for that agent. The agent application or CLI does not always need to be installed at setup time. If one platform registration fails, keep successful registrations, record the failed platform as an exact blocker, and explain that the user can rerun the script after preparing that platform.
-
-Keep `AGENTS.md` as the common entrypoint for all agents. Dedicated hooks or skills may improve integration, but agents without a dedicated Graphify hook must still receive the Graphify and MemoryMesh instructions through `AGENTS.md`.
-
-Fallback per-platform registrations are:
-
-```bash
-graphify install --platform claude       # Claude Code
-graphify install --platform codex        # Codex
-graphify install --platform opencode     # OpenCode
-graphify install --platform agents       # Agents-compatible assistant
-graphify install --platform antigravity  # Antigravity
-```
-
-When a new agent is supported but not covered by `graphify install --project`, add exactly one labeled fallback registration command to `.mesh/scripts/install-graphify-agents.sh` and document it in this section. Do not scatter agent-specific registration instructions across unrelated project files.
-
-## Graph freshness
-
-The graph can become stale after project changes.
-
-Mark the graph as potentially stale when a task materially changes:
-
-- architecture;
-- dependencies;
-- major modules or APIs;
-- database schemas;
-- project documentation;
-- file relationships represented in the graph.
-
-Record a `GRAPH_STALE` event in `work.log`. Do not automatically rebuild unless the user requested a rebuild or the current command explicitly includes it.
-
-After a successful build or update, record `GRAPH_BUILT` or `GRAPH_UPDATED` and update the Graphify section in `.mesh/OVERVIEW.md`.
-
-## `work.log`
-
-`.mesh/work.log` is append-only. Never edit old entries in place. Correct errors with a `CORRECTION` event.
-
-Event header:
-
-```text
-### YYYY-MM-DD HH:MM | <model-id> | <EVENT>
-```
-
-Event types:
-
-```text
-PROJECT_BOOTSTRAPPED, RE_ENGAGED, PROMPT, WORK_START, WORK_END,
-FILES_CREATED, FILES_MODIFIED, FILES_MOVED, FILES_DELETED,
-DECISION, NOTE, CHECKPOINT, CONTEXT_PRESSURE, HANDOFF,
-HANDOFF_RECEIVED, HANDOFF_CLOSED, HANDOFF_RECOMMENDED,
-GRAPH_STALE, GRAPH_BUILT, GRAPH_UPDATED,
-BLOCKER, CORRECTION, TOOL_INSTALLED, TOOL_CONFIGURED
-```
-
-Append each event with one append operation. Do not read, modify, and rewrite the entire log.
-
-## Checkpoints
-
-Leave a `CHECKPOINT` when any of these conditions applies:
-
-- a file is created, moved, or deleted;
-- three or more files are modified;
-- the task spans implementation, testing, refactoring, documentation, or other phases;
-- many files were inspected;
-- the user changed direction;
-- meaningful progress would be difficult to reconstruct;
-- a risky or large change is about to occur.
-
-Format:
-
-```text
-### YYYY-MM-DD HH:MM | <model-id> | CHECKPOINT
-Summary: <completed work>
-Changed files: <paths>
-Current focus: <current step>
-Remaining: <remaining work>
-Risks: <uncertainties, stale graph, missing tests, or blockers>
-```
-
-## Context pressure and handoff
-
-Context pressure is high when two or more of these signals apply:
-
-- the conversation is long;
-- many files were read;
-- several files were changed;
-- direction changed more than once;
-- many unresolved assumptions remain;
-- the next step requires careful continuity;
-- earlier constraints are being re-read repeatedly.
-
-Record:
-
-```text
-### YYYY-MM-DD HH:MM | <model-id> | CONTEXT_PRESSURE
-Reason: <why the current context is risky>
-Current state: <short state summary>
-Recommendation: <continue, checkpoint, handoff, or fresh session>
-```
-
-When another agent or session should continue, create:
-
-```text
-.mesh/handoffs/handoff_<topic>.<from-model-id>.md
-```
-
-Include:
-
-- work summary;
-- changed files;
-- decisions;
-- current state;
-- remaining work;
-- known risks;
-- graph freshness;
-- exact next action.
-
-Log `HANDOFF` when creating it, `HANDOFF_RECEIVED` when taking it over, and `HANDOFF_CLOSED` when finished.
-
-Before stopping a substantial incomplete task, leave at least one of:
-
-- a recent `CHECKPOINT`;
-- a `WORK_END` with clear remaining steps;
-- a `HANDOFF` with a handoff file;
-- a `CONTEXT_PRESSURE` record.
-
-## Rotation and index
-
-Use:
-
-- `.mesh/work.log` for recent hot history;
-- `.mesh/archive/` for older detailed logs;
-- `.mesh/cold/` for long-term digests;
-- `.mesh/INDEX.md` to locate older records and open handoffs.
-
-Move old records rather than delete them. Do not read all historical records by default.
-
-## Maintaining `OVERVIEW.md`
-
-Keep `.mesh/OVERVIEW.md` brief.
-
-Update it when these change:
-
-- project purpose;
-- technology stack;
-- core structure;
-- settled decisions;
-- current work;
-- open handoffs;
-- important constraints;
-- Graphify installation or graph status.
+MemoryMesh does not watch the project folder. Changes made outside the active agent are not automatically added to the work log or state file. Inspect and record them only when the user requests it.
 
 ## Sensitive information
 
-Do not write API keys, passwords, tokens, session cookies, private credentials, or unnecessary personal data into `.mesh/` or Graphify memory files.
+Do not store API keys, passwords, tokens, session cookies, private credentials, or unnecessary personal data in MemoryMesh files.
 
 ## Uncertainty
 
-When uncertain, proceed conservatively. Record the assumption, uncertainty, and required verification in `work.log` or the handoff file.
+When evidence is incomplete, preserve the uncertainty. Record the assumption and the verification needed instead of presenting it as confirmed.
 <!-- MEMORYMESH:PROTOCOL:END -->
 ````
 
 ---
 
-## 4. Create the control files
+## 5. `.mesh/STATE.md` 생성 또는 갱신
 
-Create each file only when absent. Preserve existing project-specific content.
-
-### `.mesh/OVERVIEW.md`
+- 파일이 없으면 아래 구조로 만듭니다.
+- 파일이 있으면 확인된 현재 상태만 갱신합니다.
+- 알 수 있는 내용을 `TBD`로 남기지 않습니다.
+- 근거가 없는 내용을 추정하지 않습니다.
+- 오래된 상태를 누적하지 않고 현재 내용으로 교체합니다.
+- 업무 일지의 시간순 기록을 복사하지 않습니다.
 
 ```markdown
-# Project Overview
+# Project State
 
 ## Purpose
-TBD. Fill in after inspecting the project.
+<project purpose or unknown>
 
-## Tech stack or nature of work
-TBD.
+## Current objective
+<current objective or none recorded>
 
-## Current state
-MemoryMesh initialized. Project details not yet captured.
+## Current status
+<concise current status>
+
+## Recent material changes
+- <change or none recorded>
 
 ## Settled decisions
-None recorded.
+- <decision or none recorded>
 
-## Current work
-None recorded.
+## Next action
+<exact next action or none recorded>
 
 ## Open handoffs
-None.
+- <handoff path and status or none>
 
-## Graphify
-- CLI: installation pending verification
-- Assistant skill: pending verification
-- Registration script: `.mesh/scripts/install-graphify-agents.sh`
-- All-agent registration: pending verification
-- Graph status: not generated
-- Wiki status: not generated
-- Output: `graphify-out/`
+## Risks and uncertainties
+- <risk or none recorded>
 
-## Important constraints
-- Read `.mesh/PROTOCOL.md` before changes.
-- Read recent `.mesh/work.log` before Task mode.
-- Use scoped Graphify queries before broad raw-file searches when a graph exists.
-- Verify important Graphify findings against project source files.
-- Leave a checkpoint or clear work-end record for substantial work.
+## Work log
+<path configured in .mesh/CONFIG.md>
+
+## Updated
+<YYYY-MM-DD HH:MM and agent or model>
 ```
 
-### `.mesh/work.log`
+프로젝트 목적과 현재 상태는 실제 프로젝트 파일과 선택된 업무 일지에서 확인한 범위만 기록합니다.
+
+---
+
+## 6. 기본 업무 일지 생성
+
+기존 업무 일지가 없을 때만 `.mesh/work.log`를 만듭니다.
 
 ```text
-# MemoryMesh work.log
+# MemoryMesh work log
 #
-# Append-only event log.
-# Header: ### YYYY-MM-DD HH:MM | <model-id> | <EVENT>
-# Correct old entries with CORRECTION; never edit them in place.
+# Append new entries. Correct earlier entries with a later CORRECTION note.
 # Full rules: .mesh/PROTOCOL.md
 # ============================================================
 ```
 
-### `.mesh/INDEX.md`
+최초 설치 기록을 한 번 추가합니다.
 
-```markdown
-# MemoryMesh Index
-
-## Topics
-| Topic | File | Notes |
-|---|---|---|
-
-## Open handoffs
-| Handoff | From | To | Status | Notes |
-|---|---|---|---|---|
-
-## Recent archives
-| Date | File | Topic |
-|---|---|---|
-
-## Integrations
-| Tool | Version | Scope | Status | Notes |
-|---|---|---|---|---|
-| Graphify | pending | project | pending | All-agent registration script not yet verified |
+```text
+### YYYY-MM-DD HH:MM | <agent-or-model> | SETUP
+Summary: MemoryMesh continuity initialized.
+Files: .mesh/CONFIG.md, .mesh/PROTOCOL.md, .mesh/STATE.md, .mesh/work.log, and managed instruction files
+Next: none
+Risks: none or <verified issue>
 ```
+
+기존 업무 일지를 선택한 경우에는 그 일지의 형식과 문체를 유지합니다. 안전하게 추가할 위치와 형식을 판단할 수 있을 때만 설치 사실을 한 줄 기록합니다. 판단하기 어렵다면 기존 일지를 수정하지 않고 완료 보고에 밝힙니다.
 
 ---
 
-## 5. Create or update root instruction files
+## 7. 최상위 지침 파일 생성 또는 갱신
 
 ### `AGENTS.md`
 
-Use this managed block:
+다음 관리 블록을 사용합니다.
 
 ```markdown
 <!-- MEMORYMESH:START -->
 ## MemoryMesh
-This project uses `.mesh/` for work continuity and Graphify for generated project-wide knowledge.
+This project uses `.mesh/` for cross-session and cross-agent work continuity.
 
-`AGENTS.md` is the common entrypoint for all agents. Agents without a dedicated Graphify hook or skill still use these instructions.
+Before changing project files, read `.mesh/PROTOCOL.md`, `.mesh/CONFIG.md`, `.mesh/STATE.md`, and the recent part of the work log configured in `.mesh/CONFIG.md`.
 
-`.mesh/` is the only cross-agent work record location. Do not use Claude Code memory, Codex session state, or any other agent private/internal store for project work continuity.
+Use the configured work log as the only chronological cross-agent work record. Do not duplicate entries in another log or rely on an agent-private memory store as the only project record.
 
-Before changing project files, read `.mesh/PROTOCOL.md`, `.mesh/OVERVIEW.md`, and the recent tail of `.mesh/work.log`.
+Questions, status requests, opinions, evaluations, comparisons, counts, and yes-or-no requests are read-only. A verb inside a question is not a command.
 
-Questions, status requests, opinions, and evaluations are read-only. A verb inside a question is not a command.
+Keep `.mesh/STATE.md` concise and current. Create a handoff file only when details needed for transfer do not fit in the state summary.
 
-When `graphify-out/graph.json` exists, use scoped Graphify queries or `graphify-out/wiki/index.md` before broad raw-file searches. Verify consequential findings against the original project files.
-
-Use Graphify from inside the active AI coding assistant. Do not use terminal `graphify .` as the default graph build path because headless extraction can require API keys.
-
-Record meaningful work, checkpoints, graph freshness, and handoffs according to `.mesh/PROTOCOL.md`.
+Verify consequential conclusions against the original project files. Preserve existing user-authored content and report conflicts instead of overwriting it.
 <!-- MEMORYMESH:END -->
 ```
 
-Apply these rules:
+적용 규칙은 다음과 같습니다.
 
-- If `AGENTS.md` does not exist, create it with the managed block.
-- If the block exists, replace only the content inside the block.
-- If the file exists without the block, preserve it and append the block.
-- If an existing instruction directly conflicts, preserve it and report the conflict.
+- 파일이 없으면 관리 블록으로 만듭니다.
+- 관리 블록이 있으면 블록 안의 내용만 교체합니다.
+- 파일은 있지만 관리 블록이 없으면 기존 내용을 보존하고 블록을 덧붙입니다.
+- 직접 충돌하는 기존 지침은 보존하고 완료 보고에 표시합니다.
 
 ### `CLAUDE.md`
 
-Use:
+다음 관리 블록을 사용합니다.
 
 ```markdown
 <!-- MEMORYMESH:CLAUDE:START -->
@@ -536,9 +352,7 @@ Read `AGENTS.md` and `.mesh/PROTOCOL.md` before changing project files.
 
 ### `GEMINI.md`
 
-Keep this file for Antigravity and other Google/Gemini-family tools that read Gemini-style instruction files. Do not treat this as a Gemini CLI registration step.
-
-Use:
+다음 관리 블록을 사용합니다.
 
 ```markdown
 <!-- MEMORYMESH:GEMINI:START -->
@@ -546,295 +360,65 @@ Read `AGENTS.md` and `.mesh/PROTOCOL.md` before changing project files.
 <!-- MEMORYMESH:GEMINI:END -->
 ```
 
-For each pointer file:
+각 포인터 파일은 없으면 만들고, 있으면 MemoryMesh 관리 블록만 갱신합니다. 다른 내용은 보존합니다.
 
-- create it when absent;
-- update only its managed block when present;
-- preserve all other content.
-
-Do not create `opencode.md`. OpenCode uses `AGENTS.md`.
+`opencode.md`는 만들지 않습니다. OpenCode는 `AGENTS.md`를 사용합니다.
 
 ---
 
-## 6. Install and configure Graphify
+## 8. 기존 설치 다시 적용
 
-The official Python package is `graphifyy`; the installed command is `graphify`.
+기존 MemoryMesh 구조가 있으면 다음 원칙으로 갱신합니다.
 
-Install the base package only. Do not install optional backend extras such as `[openai]`, `[gemini]`, `[ollama]`, `[kimi]`, or `[all]`.
-
-### 6.1 Install the base package as a user-level tool
-
-When `graphify --version` succeeds, keep the installed version.
-
-Otherwise use the first available method.
-
-Preferred:
-
-```bash
-uv tool install graphifyy
-```
-
-Alternative:
-
-```bash
-pipx install graphifyy
-```
-
-If a PATH update is required, run the tool’s PATH update command when available, such as:
-
-```bash
-uv tool update-shell
-```
-
-or:
-
-```bash
-pipx ensurepath
-```
-
-Do not use `pip install` or install into the project virtual environment.
-
-Verify:
-
-```bash
-graphify --version
-graphify install --help
-```
-
-If Python 3.10 or newer, a supported installer, network access, or permission is unavailable:
-
-1. record a `BLOCKER` event;
-2. complete every other MemoryMesh step;
-3. report Graphify as the only incomplete component.
-
-### 6.2 Create and run the project registration script
-
-Register Graphify at the project level for all currently known AI coding agents in one run. Do not require the user or the current agent to run separate commands for Claude Code, Codex, OpenCode, Antigravity, or other known platforms.
-
-Create or update `.mesh/scripts/install-graphify-agents.sh` with this managed script:
-
-```bash
-#!/usr/bin/env bash
-set -u
-
-if ! command -v graphify >/dev/null 2>&1; then
-  echo "BLOCKER: graphify command not found" >&2
-  exit 1
-fi
-
-failed=0
-succeeded=""
-failed_labels=""
-
-run_registration() {
-  label="$1"
-  shift
-  echo "==> ${label}: $*"
-  if "$@"; then
-    echo "OK: ${label}"
-    succeeded="${succeeded}${label}; "
-  else
-    status=$?
-    echo "WARN: ${label} registration failed with exit code ${status}" >&2
-    failed=1
-    failed_labels="${failed_labels}${label}(${status}); "
-  fi
-}
-
-if graphify install --help 2>&1 | grep -q -- '--project'; then
-  run_registration "Graphify all-agent project registration" graphify install --project
-else
-  echo "WARN: graphify install --project is unavailable; using fallback per-platform registrations" >&2
-  run_registration "Claude Code" graphify install --platform claude
-  run_registration "Codex" graphify install --platform codex
-  run_registration "OpenCode" graphify install --platform opencode
-  run_registration "Agents-compatible assistant" graphify install --platform agents
-  run_registration "Antigravity" graphify install --platform antigravity
-fi
-
-echo "SUMMARY: registered=${succeeded:-none}"
-if [ "${failed}" -ne 0 ]; then
-  echo "SUMMARY: failed=${failed_labels}" >&2
-  echo "Some platform registrations failed. Successful registrations remain in place; rerun this script after resolving the listed platform blockers." >&2
-fi
-
-exit "${failed}"
-```
-
-Make it executable when the platform supports POSIX permissions:
-
-```bash
-chmod +x .mesh/scripts/install-graphify-agents.sh
-```
-
-Run exactly one project registration command from the project root:
-
-```bash
-.mesh/scripts/install-graphify-agents.sh
-```
-
-The script uses `graphify install --project` as the primary path. That command is the universal Graphify project registration point and should work no matter which supported agent applied the MemoryMesh setup first. A project initialized from Codex can later be opened from Claude Code, Antigravity, OpenCode, or another supported agent; the reverse direction should work the same way as long as the all-agent registration succeeded.
-
-Some platform registrations create project or user instruction files and do not require the corresponding agent app or CLI to be installed at setup time. If `graphify install --project` is unavailable, the script falls back to per-platform registrations. If a fallback platform registration fails, the script keeps successful registrations, prints a summary, exits nonzero, and the setup must record only the failed platform as a blocker.
-
-Fallback per-platform registration methods are documented in `.mesh/PROTOCOL.md` and must match the script:
-
-- Claude Code: `graphify install --platform claude`
-- Codex: `graphify install --platform codex`
-- OpenCode: `graphify install --platform opencode`
-- Agents-compatible assistant: `graphify install --platform agents`
-- Antigravity: `graphify install --platform antigravity`
-
-For a new agent, first rely on an updated Graphify package and `graphify install --project`. Only add a new fallback line to `.mesh/scripts/install-graphify-agents.sh` and `.mesh/PROTOCOL.md` when the native project installer does not cover that agent. Keep `AGENTS.md` as the common entrypoint for all agents so tools without a dedicated hook or skill still receive the Graphify usage instructions.
-
-After registration, verify that installed instructions describe assistant-skill usage, not headless API extraction as the default graph build path. Report each registration that failed and each registration that succeeded. Do not claim all-agent setup success unless the script completed successfully. When failures remain, state that MemoryMesh setup is complete except for the listed Graphify platform registrations.
-
-### 6.3 Create or update `.graphifyignore`
-
-Preserve existing patterns and create or update only this managed block:
-
-```gitignore
-# MEMORYMESH-GRAPHIFY:START
-.agents/
-.claude/
-.codex/
-.git/
-.mesh/
-graphify-out/
-AGENTS.md
-CLAUDE.md
-GEMINI.md
-memorymesh-setup.md
-# MEMORYMESH-GRAPHIFY:END
-```
-
-This prevents operational logs, generated output, and the installer prompt from becoming graph input.
-
-Do not modify `.gitignore`.
-
-Graphify also respects `.gitignore`. If `.gitignore` excludes important project source folders, report that the excluded files will not appear in the graph.
-
-### 6.4 Record Graphify configuration
-
-Append one event to `.mesh/work.log`:
-
-```text
-### YYYY-MM-DD HH:MM | <model-id> | TOOL_CONFIGURED
-Tool: Graphify
-Package: graphifyy
-Version: <verified version>
-Scope: project
-Registration script: .mesh/scripts/install-graphify-agents.sh
-Registered agents: all supported Graphify project registrations, or exact blockers
-Changed files: <paths>
-Initial graph: not generated
-Initial Wiki: not generated
-Status: <complete or exact blocker>
-```
-
-Update the Graphify row in `.mesh/INDEX.md` with the verified version, project scope, registration script, and all-agent registration status.
-
-Update the Graphify section in `.mesh/OVERVIEW.md`.
+- 기존 사용자 파일과 업무 일지를 보존합니다.
+- 현재 관리 블록만 새 내용으로 교체합니다.
+- `.mesh/CONFIG.md`가 없으면 실제 업무 일지 경로를 확인해 만듭니다.
+- `.mesh/STATE.md`가 없으면 기존 개요와 최근 기록에서 현재 정보만 옮겨 만듭니다.
+- 기존 폴더와 파일은 자동으로 삭제하지 않습니다.
+- 현재 구조에서 쓰지 않는 이전 설치 항목은 완료 보고에 목록으로 표시합니다.
+- 삭제 방법은 배포본 `README.md`의 이전 버전 갱신 안내를 참조하도록 알립니다.
 
 ---
 
-## 7. Record initialization
+## 9. 설치 검증
 
-Append exactly one setup event to `.mesh/work.log`, in addition to the Graphify configuration event.
-
-For a first install:
+다음 필수 항목을 확인합니다.
 
 ```text
-### YYYY-MM-DD HH:MM | <model-id> | PROJECT_BOOTSTRAPPED
-Vendor: <vendor or unknown>
-Harness: <harness or unknown>
-Capabilities: <known capabilities>
-Context-window: <known value or unknown>
-Summary: MemoryMesh continuity initialized and Graphify project registration script configured.
-Graphify: <complete or exact blocker>
-Graph and Wiki: not generated
-Preserved: <existing files>
-Conflicts: <none or summary>
-```
-
-For re-engagement:
-
-```text
-### YYYY-MM-DD HH:MM | <model-id> | RE_ENGAGED
-Summary: Existing MemoryMesh structure inspected and standard setup verified or updated.
-Graphify: <complete or exact blocker>
-Graph and Wiki: <existing status>
-Preserved: <existing files>
-Conflicts: <none or summary>
-```
-
-Use the current local date and time.
-
----
-
-## 8. Verify the setup
-
-Verify that these items exist:
-
-```text
+.mesh/CONFIG.md
 .mesh/PROTOCOL.md
-.mesh/OVERVIEW.md
-.mesh/work.log
-.mesh/INDEX.md
-.mesh/handoffs/
-.mesh/archive/
-.mesh/cold/
-.mesh/reports/
-.mesh/scripts/
-.mesh/scripts/install-graphify-agents.sh
+.mesh/STATE.md
 AGENTS.md
 CLAUDE.md
 GEMINI.md
-.graphifyignore
 ```
 
-Also verify:
+다음 조건부 항목도 확인합니다.
 
-- MemoryMesh managed blocks remain intact;
-- existing user-authored instructions were preserved;
-- `graphify --version` succeeds, unless an exact blocker was recorded;
-- `.mesh/scripts/install-graphify-agents.sh` exists and is executable where POSIX permissions apply;
-- Graphify was registered for all currently known assistant harnesses, or exact blockers were recorded;
-- `AGENTS.md` remains the common entrypoint for agents without dedicated Graphify hooks or skills;
-- `graphify-out/` was not created merely by setup.
+- 기존 업무 일지가 없었다면 `.mesh/work.log`가 생성되었는지 확인합니다.
+- 기존 업무 일지를 선택했다면 `.mesh/CONFIG.md`의 경로와 실제 파일이 일치하는지 확인합니다.
+- 인계 문서를 만든 적이 있다면 `.mesh/handoffs/`와 상태 파일의 링크가 일치하는지 확인합니다.
 
-Do not claim success for an unverified component.
+아울러 다음 사항을 검증합니다.
+
+- MemoryMesh 관리 블록의 시작과 끝 표식이 온전합니다.
+- 기존 사용자 작성 내용이 보존되었습니다.
+- 기준 업무 일지는 하나만 설정되었습니다.
+- 현재 상태와 업무 일지에 같은 시간순 기록이 중복되지 않았습니다.
+- 확인하지 않은 항목을 성공으로 보고하지 않습니다.
 
 ---
 
-## 9. Report completion
+## 10. 완료 보고
 
-Keep the final report concise.
+완료 보고는 간결하게 작성하고 다음 내용을 포함합니다.
 
-State:
+- 최초 설치 또는 재적용 여부
+- 설정된 업무 일지 경로와 소유 구분
+- 생성하거나 갱신한 파일 전체 목록
+- 보존한 기존 파일과 사용자 내용
+- 사용하지 않는 이전 설치 항목
+- 충돌, 불확실성 또는 완료하지 못한 항목
+- 다음에 필요한 행동이 있으면 정확한 한 가지 행동
 
-- MemoryMesh setup completion;
-- Graphify version and all-agent project registration status;
-- preserved conflicts or actual blockers;
-- whether the current AI coding assistant should be restarted;
-- the single project registration command and the Graphify assistant command to run after restart.
-
-Do not tell the user to run terminal `graphify . --wiki` for the initial graph build.
-
-Use the active assistant command.
-
-For Claude Code, OpenCode, Antigravity, or a compatible slash-command assistant:
-
-```text
-/graphify . --wiki
-```
-
-For Codex:
-
-```text
-$graphify . --wiki
-```
-
-Explain in one sentence that this assistant-skill command creates the project-wide knowledge graph, report, visualization, and Markdown Wiki under `graphify-out/`.
-
-If an actual blocker remains, report only the blocker and what was completed.
+여러 파일을 변경했다면 일부 예만 들지 말고 변경한 파일 전체를 제시합니다.
