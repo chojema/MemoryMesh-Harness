@@ -28,9 +28,10 @@
 ```text
 .mesh/
 AGENTS.md
-CLAUDE.md
 GEMINI.md
 ```
+
+프로젝트 최상위에 `CLAUDE.md`가 있는지도 확인합니다. 있으면 MemoryMesh 관리 블록(`MEMORYMESH:CLAUDE`)과 MemoryMesh와 충돌하는 지침이 있는지 확인합니다. 없으면 새로 만들지 않습니다.
 
 `.mesh/`가 있으면 다음 파일을 우선 확인합니다.
 
@@ -342,13 +343,22 @@ Verify consequential conclusions against the original project files. Preserve ex
 
 ### `CLAUDE.md`
 
-다음 관리 블록을 사용합니다.
+`CLAUDE.md`가 없으면 만들지 않습니다. Claude Code는 `AGENTS.md`를 사용합니다.
+
+프로젝트 최상위에 `CLAUDE.md`가 이미 있으면 다음 관리 블록을 사용합니다.
 
 ```markdown
 <!-- MEMORYMESH:CLAUDE:START -->
 Read `AGENTS.md` and `.mesh/PROTOCOL.md` before changing project files.
 <!-- MEMORYMESH:CLAUDE:END -->
 ```
+
+적용 규칙은 다음과 같습니다.
+
+- 관리 블록이 있으면 블록 안의 내용만 교체합니다.
+- 관리 블록이 없으면 기존 내용을 보존하고 블록을 덧붙입니다.
+- 다른 업무 일지나 메모리 체계를 지정하는 등 MemoryMesh와 충돌하는 기존 지침은 보존하고 완료 보고에 충돌로 표시합니다.
+- 하위 폴더의 `CLAUDE.md`, `CLAUDE.local.md`와 사용자 전역 설정 파일은 변경하지 않습니다.
 
 ### `GEMINI.md`
 
@@ -360,7 +370,7 @@ Read `AGENTS.md` and `.mesh/PROTOCOL.md` before changing project files.
 <!-- MEMORYMESH:GEMINI:END -->
 ```
 
-각 포인터 파일은 없으면 만들고, 있으면 MemoryMesh 관리 블록만 갱신합니다. 다른 내용은 보존합니다.
+`GEMINI.md`는 없으면 만들고, 있으면 MemoryMesh 관리 블록만 갱신합니다. 다른 내용은 보존합니다.
 
 `opencode.md`는 만들지 않습니다. OpenCode는 `AGENTS.md`를 사용합니다.
 
@@ -389,7 +399,6 @@ Read `AGENTS.md` and `.mesh/PROTOCOL.md` before changing project files.
 .mesh/PROTOCOL.md
 .mesh/STATE.md
 AGENTS.md
-CLAUDE.md
 GEMINI.md
 ```
 
@@ -397,6 +406,8 @@ GEMINI.md
 
 - 기존 업무 일지가 없었다면 `.mesh/work.log`가 생성되었는지 확인합니다.
 - 기존 업무 일지를 선택했다면 `.mesh/CONFIG.md`의 경로와 실제 파일이 일치하는지 확인합니다.
+- 기존 `CLAUDE.md`가 있었다면 `MEMORYMESH:CLAUDE` 관리 블록이 하나만 있고 기존 내용이 보존되었는지 확인합니다.
+- 기존 `CLAUDE.md`가 없었다면 새로 만들지 않았는지 확인합니다.
 - 인계 문서를 만든 적이 있다면 `.mesh/handoffs/`와 상태 파일의 링크가 일치하는지 확인합니다.
 
 아울러 다음 사항을 검증합니다.
@@ -417,6 +428,7 @@ GEMINI.md
 - 설정된 업무 일지 경로와 소유 구분
 - 생성하거나 갱신한 파일 전체 목록
 - 보존한 기존 파일과 사용자 내용
+- `CLAUDE.md` 처리 결과(관리 블록 추가, 갱신 또는 파일이 없어 생략)
 - 사용하지 않는 이전 설치 항목
 - 충돌, 불확실성 또는 완료하지 못한 항목
 - 다음에 필요한 행동이 있으면 정확한 한 가지 행동
