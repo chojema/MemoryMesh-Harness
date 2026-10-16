@@ -16,6 +16,8 @@
 8. 질문과 상태 확인은 읽기 전용으로 처리합니다.
 9. 같은 폴더에 다시 적용해도 기존 기록과 사용자 내용을 보존해야 합니다.
 10. 확인한 충돌, 보존한 내용과 완료하지 못한 항목을 정확하게 보고합니다.
+11. 사용자가 요청한 작업에 필요한 MemoryMesh 기록은 별도 허락이나 중간 승인 없이 직접 편집하고 저장한 뒤 결과를 보고합니다. 기록 갱신만을 위한 추가 요청을 요구하지 않습니다.
+12. 실행 환경의 파일 접근 제한과 보안 정책은 준수합니다. 기록을 저장할 수 없으면 가능한 본 작업은 계속하고, 완료 보고에 저장하지 못한 기록과 이유를 밝힙니다.
 
 ---
 
@@ -182,6 +184,17 @@ Before changing project files:
 
 `.mesh` is a hidden folder. Read the required paths directly when a search tool skips hidden content.
 
+## Autonomous record updates
+
+A user request to perform a task also authorizes the MemoryMesh record updates needed for that task. A separate request to update records is not required.
+
+- Append meaningful work to the configured work log, update `.mesh/STATE.md` when its current-state information changes, and save handoff notes only when transfer details require them. Create missing record files and directories only as required by this protocol and the setup rules.
+- During setup or reapplication, also create or update the required configuration, protocol, and managed instruction blocks as specified in this document.
+- Edit and save these files directly without asking for permission, confirmation, approval, or whether to continue recording. Complete necessary record updates before the final response, then concisely report the saved files and results.
+- Preserve user-authored content, established history, the single configured work log, and the limits on state and handoff updates. This authorization does not permit unrelated project changes, deletion of history, external publication, or storage of sensitive information.
+- Query mode remains read-only. Do not create or update records for a question or status request.
+- Respect enforced filesystem permissions and security policies. Do not bypass restrictions or change agent approval settings to save records. If writing is blocked, avoid repeated permission requests, continue any authorized work that remains possible, and report unsaved records and the reason in the final response. Never claim an unsuccessful save succeeded.
+
 ## Work log
 
 Treat the configured work log as the only chronological cross-agent work record.
@@ -330,6 +343,8 @@ Questions, status requests, opinions, evaluations, comparisons, counts, and yes-
 
 Keep `.mesh/STATE.md` concise and current. Create a handoff file only when details needed for transfer do not fit in the state summary.
 
+For an authorized task, autonomously append to the configured work log, update `.mesh/STATE.md` when needed, and save any required handoff notes without separate permission or approval requests. Save necessary records before the final response and report the results. Query mode remains read-only. Respect enforced permissions; if saving is blocked, continue any work that remains possible and report unsaved records without repeated permission requests.
+
 Verify consequential conclusions against the original project files. Preserve existing user-authored content and report conflicts instead of overwriting it.
 <!-- MEMORYMESH:END -->
 ```
@@ -417,6 +432,8 @@ GEMINI.md
 - 기준 업무 일지는 하나만 설정되었습니다.
 - 현재 상태와 업무 일지에 같은 시간순 기록이 중복되지 않았습니다.
 - 확인하지 않은 항목을 성공으로 보고하지 않습니다.
+- `.mesh/PROTOCOL.md`와 `AGENTS.md`의 관리 블록에 작업 기록을 별도 승인 없이 편집하고 저장한다는 원칙과 질문의 읽기 전용 원칙이 함께 반영되었습니다.
+- 실행 환경이 기록 저장을 차단했으면 저장하지 못한 파일과 이유를 확인했으며, 이를 완료 보고에 포함합니다.
 
 ---
 
