@@ -68,10 +68,9 @@ Requests for information, opinions, or answer organization do not change files. 
 
 ## Notes and limitations
 
-- Work resumes from saved records. Information that was not saved before an abrupt exit may not carry over.
+- If a session ends abruptly, decisions or intentions that existed only in the conversation may not carry over. Work results left in files are checked and added to the records when the next task starts.
 - Automatic recording and resumption may not work if an agent's settings prevent it from reading project instructions or saving files.
 - While a tool is running, the agent may be unable to send progress updates until control returns.
-- Reviewed external skill sources are downloaded only when you request it, and the agent does not ask about it during use. Core features work without downloads.
 
 ## License
 

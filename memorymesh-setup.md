@@ -1,7 +1,7 @@
 # MemoryMesh Setup
 
-- Setup revision: `2026-11-08.7`
-- Protocol revision: `7`
+- Setup revision: `2026-11-08.8`
+- Protocol revision: `8`
 - Preserve real paths, names, quoted user text, and the project's record language.
 
 ## 1. Execute this file
@@ -89,8 +89,8 @@ Preserve valid existing progress thresholds and external_skill_fetch values unle
 # MemoryMesh Configuration
 
 <!-- MEMORYMESH:CONFIG:START -->
-setup_revision: 2026-11-08.7
-protocol_revision: 7
+setup_revision: 2026-11-08.8
+protocol_revision: 8
 work_log: <project-relative path>
 work_log_owner: <existing or memorymesh>
 record_language: <project language or user's language>
@@ -125,7 +125,7 @@ During active work, answer an incoming question briefly without creating new edi
 Ask only when unresolved uncertainty materially affects scope, preservation, external effects, or safety; use available context first. Keep the setup's required mode choice and enforced permission checks. Ordinary authorized work and its record reads, log appends, STATE updates, and required handoff saves need no separate continuation or recording approval.
 
 ## Begin or resume
-Read PROTOCOL, CONFIG, STATE, and relevant recent log entries. Read an open handoff only when relevant. Apply previous decisions, user constraints, verified results, useful failed approaches, and next steps to the current request. Compare relevant originals and, if available, Git status/differences before relying on old state. Preserve uncertainty when records and files disagree; do not invent causes or authorship.
+Read PROTOCOL, CONFIG, STATE, and relevant recent log entries. Read an open handoff only when relevant. Apply previous decisions, user constraints, verified results, useful failed approaches, and next steps to the current request. Compare relevant originals and, if available, Git status/differences before relying on old state. Preserve uncertainty when records and files disagree; do not invent causes or authorship. When beginning an authorized task, if files relevant to the recorded work or the current request changed after the latest record, for example because a session ended before saving, append one RECOVERED entry listing the observed changes, marked as inferred from files with the author unknown unless evidence shows otherwise, and update STATE if the current status changed. Do not do this for a read-only query.
 
 Within one coherent task, reuse already-read, unchanged instructions and records. Reread for a new task, after compaction or a handoff, after relevant changes, or when uncertain. Search older history only when current state and recent entries are insufficient.
 
@@ -145,7 +145,7 @@ Keep updates brief and evidence-based; they are progress notices, not new approv
 ## Record during work and before every task response
 Before each final task response, append a concise delta for new meaningful work, decisions, verification, blockers, and next actions. Update STATE only if current information changed. Save required records and confirm the written portion or equivalent persisted result before responding. If no new meaningful work occurred, do not duplicate an existing entry.
 
-Checkpoint during a long response cycle after a material decision, completed stage, useful failure diagnosis, or verification result. Only saved progress survives interruption. Do not depend on intercepting /exit, a shutdown hook, or a last-minute user request.
+Checkpoint during a long response cycle after a material decision, completed stage, useful failure diagnosis, or verification result. Before starting an operation that may run long or be cut off, such as a long build, test run, bulk edit, or large generation, save the current stage, the operation about to run, and the next step. Only saved progress survives interruption. Do not depend on intercepting /exit, a shutdown hook, or a last-minute user request.
 
 Keep the log append-only and preserve its format. Correct history with a later correction entry. Record changes and reasons, exact paths, useful successes/failures, verification method/result/scope, unresolved issues, and next actions as needed. Link long outputs. Do not log routine reads, raw conversations, repeated status, or every tool call. Distinguish facts, assumptions, and unverified behavior.
 
@@ -219,8 +219,8 @@ INSTALL.json is an ownership ledger, not a second work log. This JSON example de
 ```json
 {
   "manifest_version": 1,
-  "setup_revision": "2026-11-08.7",
-  "protocol_revision": 7,
+  "setup_revision": "2026-11-08.8",
+  "protocol_revision": 8,
   "work_log": "<configured relative path>",
   "work_log_owner": "<existing or memorymesh>",
   "directories_created": [".mesh"],
@@ -250,7 +250,7 @@ Use root AGENTS.md as the common entry point, preserving existing content with t
 <!-- MEMORYMESH:START -->
 ## MemoryMesh
 When beginning or resuming an authorized task, read .mesh/PROTOCOL.md, .mesh/CONFIG.md, .mesh/STATE.md, and relevant recent log entries. Apply prior decisions and verify relevant originals. Questions, opinions, proposed changes, and answer-only summaries or lists are read-only. Reviews and verification do not authorize automatic fixes. Carry out clear action requests through a saved result, proportionate verification, and required records without repeated approval or stopping at advice.
-Checkpoint meaningful progress during work. Before every final task response, save a concise new log delta, update STATE only when current information changes, and confirm persistence. Perform in-scope record operations without separate confirmation. Preserve user content/history, follow enforced permissions, and report blocked saves accurately.
+Checkpoint meaningful progress during work and before long operations; when resuming, record relevant file changes made after the latest record as inferred. Before every final task response, save a concise new log delta, update STATE only when current information changes, and confirm persistence. Perform in-scope record operations without separate confirmation. Preserve user content/history, follow enforced permissions, and report blocked saves accurately.
 Follow the protocol for conditional skills and detailed handoffs. Reuse unchanged context within a task; do not rebuild graphs, reread full logs, or repeat broad tests for each response. Recorded next steps do not authorize unrelated work.
 In mixed messages, execute explicit instructions and answer separate proposals without implementing them. Answer mid-task questions, then continue unaffected authorized work; pause actions whose scope or authorization is disputed.
 Follow CONFIG/PROTOCOL progress rules: default to a useful update after about 60 seconds of user-facing silence and a method reassessment after about 120 seconds without meaningful advance. Status messages do not reset the progress clock. Explain healthy long waits or blockers and respect host timing/communication limits.
