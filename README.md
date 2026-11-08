@@ -1,5 +1,7 @@
 # MemoryMesh Harness
 
+[English](README.en.md)
+
 MemoryMesh는 작업 기록을 남기고 다음 작업에서 이를 읽어 반영하는 파일 기반 작업 연속성 도구입니다. 같은 에이전트의 다음 세션이나 다른 에이전트로 작업을 이어갈 수 있습니다.
 
 ## 설치
@@ -51,34 +53,4 @@ memorymesh-setup.md에 따라 기존 MemoryMesh를 백업한 뒤 초기화 설�
 
 ```text
 memorymesh-setup.md에 따라 MemoryMesh를 제거하라.
-```
-
-## English guide
-
-MemoryMesh saves useful work records and applies them when work resumes in a new session or another agent. Use the same project folder to continue.
-
-Download [memorymesh-setup.md](memorymesh-setup.md) to the project root and ask an agent that can read and write project files:
-
-```text
-Apply memorymesh-setup.md to this project.
-```
-
-Use a file-capable agent such as Codex, Claude Code, or Antigravity. Core installation requires no separate server or skill installation. The agent checks existing records and asks once whether to install, preserve and update, back up and reset, remove, or cancel. A choice already specified in the request is applied directly. Preserve and update is recommended for existing installations. Reset and removal back up MemoryMesh records while retaining project files, unrelated instructions, external work logs, and shared tools. Uncertain ownership is preserved and reported.
-
-After installation, request work normally. The agent reads prior records, saves meaningful progress during work, and records new results before its final task response. Existing work logs are reused; otherwise the log is `.mesh/work.log`. Current status is in `.mesh/STATE.md`. Questions, status checks, answer-only summaries, and discussion lists do not change files. Explicit requests to save files or update records are tasks.
-
-After replacing the setup file with a new copy, apply it again to update installed instructions:
-
-```text
-Apply memorymesh-setup.md while preserving existing records and user instructions.
-```
-
-To reset or remove MemoryMesh, request the corresponding action through the setup file:
-
-```text
-Follow memorymesh-setup.md to back up and reset MemoryMesh.
-```
-
-```text
-Follow memorymesh-setup.md to remove MemoryMesh.
 ```
