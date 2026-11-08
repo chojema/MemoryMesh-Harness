@@ -2,7 +2,7 @@
 
 - Setup revision: `2026-11-08.1`
 - Protocol revision: `2`
-- Language: English. Preserve real paths, names, quoted user text, and the project's record language.
+- Preserve real paths, names, quoted user text, and the project's record language.
 
 ## 1. Execute this file
 

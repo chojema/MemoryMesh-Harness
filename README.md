@@ -2,7 +2,7 @@
 
 MemoryMesh는 작업 중 유용한 기록을 남기고, 다음 작업을 시작할 때 그 기록을 읽어 반영하는 파일 기반 작업 연속성 체계입니다. 같은 에이전트의 다음 세션과 다른 에이전트로의 순차적 인계를 함께 지원합니다.
 
-셋업 개정 번호는 `2026-11-08.1`, 운영 규칙 개정 번호는 `2`입니다. 셋업은 영어로 작성하고, README와 릴리스 노트는 한국어를 기본으로 영문 설명을 제공합니다. 작업 기록은 기존 프로젝트의 언어와 형식을 유지합니다.
+셋업 개정 번호는 `2026-11-08.1`, 운영 규칙 개정 번호는 `2`입니다. 작업 기록은 기존 프로젝트의 언어와 형식을 유지합니다.
 
 ## 적용 방법
 
@@ -20,7 +20,7 @@ memorymesh-setup.md 파일의 설정 내용을 이 프로젝트에 적용하라.
 memorymesh-setup.md를 적용하되, 기존 기록과 사용자 지침을 유지하며 갱신하라.
 ```
 
-Markdown 파일을 복사하는 것만으로 설치가 실행되지는 않습니다. 에이전트가 영어 셋업 지침을 읽고 적용합니다.
+Markdown 파일을 복사하는 것만으로 설치가 실행되지는 않습니다. 에이전트가 셋업 지침을 읽고 적용합니다.
 
 ## 설치, 갱신, 초기화, 제거
 
@@ -122,7 +122,7 @@ memorymesh-setup.md
 
 게시 전에는 실제 최종 내용을 점검합니다. 자동 패턴 검사는 직접 검토를 보조하며, 모든 개인 정보를 검출했다는 보장은 하지 않습니다.
 
-릴리스 노트는 한국어와 추가 영문 설명으로 GitHub Releases 본문에 제공할 수 있습니다. 문서 개편만으로 릴리스를 게시하거나 원격에 푸시하지 않습니다.
+릴리스 노트는 GitHub Releases 본문에 제공할 수 있습니다. 문서 개편만으로 릴리스를 게시하거나 원격에 푸시하지 않습니다.
 
 ### 2026. 11. 08. 개편
 
@@ -146,7 +146,7 @@ Copy memorymesh-setup.md to the project root and ask a file-capable agent:
 Apply memorymesh-setup.md to this project.
 ```
 
-The English setup is the normative execution procedure. Core file operations need no preinstalled plugin, skill, shell, Git, Python, or Node.js. The agent detects the host and existing installation, shows a concrete plan, and asks once for the applicable action: Install, Preserve and apply, Back up and reset, Remove, or Cancel. An explicit choice is not confirmed again.
+The setup is the normative execution procedure. Core file operations need no preinstalled plugin, skill, shell, Git, Python, or Node.js. The agent detects the host and existing installation, shows a concrete plan, and asks once for the applicable action: Install, Preserve and apply, Back up and reset, Remove, or Cancel. An explicit choice is not confirmed again.
 
 Cancel stops immediately without backups or record changes. Remove performs only backup, removal, and removal checks; it does not create an installation first. Reset completes backup/archive before rebuilding. Install and Preserve and apply perform only their necessary setup steps. Compare date-based revisions by date and numeric suffix. An older setup is a downgrade candidate, not an upgrade, and may replace a newer installation only when that downgrade is explicitly selected in the same mode choice.
 
@@ -162,4 +162,4 @@ Adapters account for Codex overrides, Claude imports/loading behavior, and Antig
 
 Distribution and release content must exclude the user's email addresses, real name, contact details, personal identifiers, local account names, and private absolute paths. Use neutral placeholders and project-relative paths. Never copy account configuration, credentials, or private local logs into public documents. Review final content directly; pattern scans are supplementary.
 
-Distribution remains exactly README.md and memorymesh-setup.md. Local records, backups, caches, and tests stay outside publication. README and release notes are Korean-first with English explanations; setup stays English. Publish release notes in the GitHub Releases body only when a release is requested. This document revision does not itself push or publish.
+Distribution remains exactly README.md and memorymesh-setup.md. Local records, backups, caches, and tests stay outside publication. Publish release notes in the GitHub Releases body only when a release is requested. This document revision does not itself push or publish.
