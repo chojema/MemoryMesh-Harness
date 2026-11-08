@@ -1,7 +1,7 @@
 # MemoryMesh Setup
 
-- Setup revision: `2026-11-08.5`
-- Protocol revision: `6`
+- Setup revision: `2026-11-08.6`
+- Protocol revision: `7`
 - Preserve real paths, names, quoted user text, and the project's record language.
 
 ## 1. Execute this file
@@ -83,20 +83,20 @@ Replace template placeholders with verified values. Identify genuinely unknown i
 
 ### CONFIG template
 
-Preserve valid existing progress thresholds and external_skill_fetch values unless the user requests a change; use the defaults below when missing, and honor stricter host feedback requirements.
+Preserve valid existing progress thresholds and external_skill_fetch values unless the user requests a change (treat a legacy `ask` value as `on_request`); use the defaults below when missing, and honor stricter host feedback requirements.
 
 ```markdown
 # MemoryMesh Configuration
 
 <!-- MEMORYMESH:CONFIG:START -->
-setup_revision: 2026-11-08.5
-protocol_revision: 6
+setup_revision: 2026-11-08.6
+protocol_revision: 7
 work_log: <project-relative path>
 work_log_owner: <existing or memorymesh>
 record_language: <project language or user's language>
 timezone: <known project/user timezone; otherwise explicit UTC>
 skill_policy: conditional; reuse installed first; load only relevant instructions
-external_skill_fetch: ask
+external_skill_fetch: on_request
 progress_notice_after_seconds: 60
 stall_review_after_seconds: 120
 <!-- MEMORYMESH:CONFIG:END -->
@@ -157,7 +157,7 @@ Keep STATE concise: objective, current result, settled constraints, verification
 Simple continuation needs only the log and STATE. If extra detail is needed, create .mesh/handoffs/handoff_<topic>_<timestamp>.<agent>.md with exact files/identifiers, decisions/reasons, failed attempts, verification methods/results, required tools, remaining work, and the next action. Link it from STATE. Mark consumed or superseded handoffs in STATE; do not treat old transfers as active or silently overwrite them.
 
 ## Conditional procedures
-Use relevant procedures autonomously within scope. Reuse compatible installed skills first; otherwise the concise procedures below are sufficient for core continuity. Read CONFIG's source registry and only relevant skill/references when needed. Fetching an upstream source over the network depends on CONFIG's external_skill_fetch: `ask` (default) requires the user's approval for that fetch, `allowed` records standing approval, and `off` forbids it. Cache an approved source project-locally at the pinned revision, with licenses and required resources, only within available permissions, and report the cached path. Record source/revision and execution method when continuation depends on them. Do not install an entire catalog, overwrite unrelated skills, or silently update pins.
+Use relevant procedures autonomously within scope. Reuse compatible installed skills first; otherwise the concise procedures below are sufficient for core continuity. Read CONFIG's source registry and only relevant skill/references when needed. Fetching an upstream source over the network depends on CONFIG's external_skill_fetch: `on_request` (default) fetches only when the current user request asks for it, `allowed` records standing approval, and `off` forbids it. Do not offer or request fetches during ordinary work; continue with installed skills and the concise procedures instead. Cache an approved source project-locally at the pinned revision, with licenses and required resources, only within available permissions, and report the cached path. Record source/revision and execution method when continuation depends on them. Do not install an entire catalog, overwrite unrelated skills, or silently update pins.
 
 Ponytail: during implementation, reuse existing solutions and remove unnecessary complexity while completing the requested scope. Preserve validation, error handling, accessibility, and necessary records.
 
@@ -219,8 +219,8 @@ INSTALL.json is an ownership ledger, not a second work log. This JSON example de
 ```json
 {
   "manifest_version": 1,
-  "setup_revision": "2026-11-08.5",
-  "protocol_revision": 6,
+  "setup_revision": "2026-11-08.6",
+  "protocol_revision": 7,
   "work_log": "<configured relative path>",
   "work_log_owner": "<existing or memorymesh>",
   "directories_created": [".mesh"],

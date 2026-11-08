@@ -73,7 +73,7 @@ Requests for information, opinions, or answer organization do not change files. 
 - While a tool is running, the agent may be unable to send progress updates until control returns.
 - During setup, only the current agent's instruction loading can be confirmed. Entry points for other agents are prepared, and their actual loading is confirmed the first time you use them.
 - If an agent's settings disable project instructions or change the instruction filename, the entry points are not read automatically. In that case, ask the agent once to read and follow `.mesh/PROTOCOL.md`.
-- The optional feature that downloads reviewed external skill sources runs only with your approval. Core features work without downloads.
+- Reviewed external skill sources are downloaded only when you request it, and the agent does not ask about it during use. Core features work without downloads.
 
 ## License
 
