@@ -1,311 +1,165 @@
 # MemoryMesh Harness
 
-MemoryMesh Harness는 AI 코딩 에이전트가 프로젝트의 작업 상태를 여러 세션과 도구 사이에서 이어받도록 돕는 파일 기반 작업 연속성 체계입니다.
+MemoryMesh는 작업 중 유용한 기록을 남기고, 다음 작업을 시작할 때 그 기록을 읽어 반영하는 파일 기반 작업 연속성 체계입니다. 같은 에이전트의 다음 세션과 다른 에이전트로의 순차적 인계를 함께 지원합니다.
 
-2026년 6월 30일 자 버전까지는 Graphify로 프로젝트 지식 그래프와 위키를 만드는 기능도 포함했습니다. 그러나 별도 설치와 갱신 절차가 작업 연속성이라는 본래 목적에 비해 복잡했고, 기존 업무 일지와 관리 범위가 겹치며 오래된 분석 결과까지 관리해야 하는 부담이 있어 이번에 해당 기능을 제거했습니다.
+셋업 개정 번호는 `2026-11-08.1`, 운영 규칙 개정 번호는 `2`입니다. 셋업은 영어로 작성하고, README와 릴리스 노트는 한국어를 기본으로 영문 설명을 제공합니다. 작업 기록은 기존 프로젝트의 언어와 형식을 유지합니다.
 
-이번 개편에서는 기존 업무 일지를 그대로 활용하고 현재 상태와 인계에 필요한 최소 파일만 유지합니다. 설치와 관리가 단순해지고 중복 기록이 줄어들어 프로젝트 규모와 관계없이 가볍게 적용할 수 있습니다. 기존 기록이 없을 때만 `.mesh/work.log`를 기본 일지로 만듭니다.
+## 적용 방법
 
-별도의 서버, 데이터베이스와 백그라운드 서비스는 필요하지 않습니다. 프로젝트 폴더 안의 Markdown 파일(.MD)과 공통 지침만 사용합니다.
+프로젝트 최상위 폴더에 `memorymesh-setup.md`를 넣고 사용할 에이전트에 요청합니다.
 
-## 설계 원칙
+```text
+memorymesh-setup.md 파일의 설정 내용을 이 프로젝트에 적용하라.
+```
 
-- 기존 업무 일지를 우선 사용합니다.
-- 동일한 작업 내용을 여러 파일에 중복 기록하지 않습니다.
-- 현재 상태와 시간순 작업 이력을 분리합니다.
-- 실제 소스 파일과 문서를 프로젝트의 최종 기준으로 봅니다.
-- 질문, 상태 확인과 의견 요청은 읽기 전용으로 처리합니다.
-- 필요한 구성만 만들고, 사용하지 않는 폴더는 미리 생성하지 않습니다.
-- 기존 사용자 작성 내용은 덮어쓰지 않습니다.
-- 요청받은 작업에 필요한 기록은 별도 허락이나 중간 승인 없이 편집하고 저장한 뒤 결과를 보고합니다.
+같은 파일과 같은 지시로 Codex, Claude Code, Antigravity 등의 초기 적용을 시작하도록 설계했습니다. 에이전트는 파일을 직접 읽고 저장할 수 있어야 합니다. 기본 설치에는 전용 플러그인, 사전 설치된 스킬, 셸, Git, Python, Node.js가 필요하지 않습니다. 셸이 있으면 환경에 맞는 명령으로 같은 절차를 수행합니다.
 
-## 무엇을 해결하는가
+실행 환경과 기존 설치를 확인한 뒤 변경 계획을 보여주고 설치 방식을 한 번 확인합니다. 방식을 이미 명시했다면 다시 묻지 않습니다.
 
-AI 코딩 에이전트를 여러 세션에 걸쳐 사용하거나 서로 다른 도구를 번갈아 사용하면 다음 문제가 생길 수 있습니다.
+```text
+memorymesh-setup.md를 적용하되, 기존 기록과 사용자 지침을 유지하며 갱신하라.
+```
 
-- 새 세션이 이전 작업의 목적과 현재 상태를 알지 못합니다.
-- 같은 파일과 문제를 반복해서 분석합니다.
-- 변경 이유, 남은 작업과 위험 요소가 대화 종료와 함께 사라집니다.
-- 시간순 기록이 길어져 현재 상태를 찾기 어려워집니다.
-- 상태를 묻는 질문이 변경 명령으로 잘못 해석될 수 있습니다.
+Markdown 파일을 복사하는 것만으로 설치가 실행되지는 않습니다. 에이전트가 영어 셋업 지침을 읽고 적용합니다.
 
-MemoryMesh는 기존 업무 일지를 작업 이력의 기준으로 삼고, `.mesh/STATE.md`에 현재 상태만 짧게 유지합니다. 새 세션은 전체 기록을 처음부터 읽지 않고도 진행 상황과 다음 행동을 확인할 수 있습니다.
+## 설치, 갱신, 초기화, 제거
+
+상태는 신규 설치, 같은 버전 재적용, 새 버전 갱신, 이전 버전 셋업의 적용 가능성, 일부 누락 또는 버전 확인 불가로 구분합니다. 버전 정보가 없는 이전 설치를 신규로 간주하지 않습니다. 날짜와 숫자 순번으로 버전을 비교하며, 다른 버전이라는 이유만으로 업그레이드로 판단하지 않습니다. 이전 버전 적용은 설치 방식 선택 단계에서 명시하고, 사용자가 그 적용을 분명히 선택한 경우에만 진행합니다. 그렇지 않으면 설치된 새 버전을 유지합니다.
+
+| 선택 | 처리 내용 |
+|---|---|
+| 신규 설치 | 최소 기록과 해당 환경의 지침 진입점을 구성합니다. |
+| 기존 내용 유지하며 반영 | 기존 이력과 사용자 내용을 보존하고 관리 영역만 갱신합니다. 기존 설치의 기본 권장 방식입니다. |
+| 백업 후 초기화 설치 | 기존 MemoryMesh 구성과 소유 기록을 백업하고 확인된 프로젝트 상태로 다시 구성합니다. |
+| MemoryMesh 제거 | 최신 기록을 백업하고 소유권이 확인된 전용 파일과 관리 블록을 제거합니다. |
+| 취소 | 변경 없이 종료합니다. |
+
+취소는 즉시 종료하며 백업이나 기록도 만들지 않습니다. 제거는 백업과 제거, 제거 결과 확인만 수행하고 설치 파일을 새로 만들지 않습니다. 초기화는 백업과 보관을 마친 뒤 재구성합니다. 신규 설치와 기존 내용 유지 방식은 필요한 구성 생성 또는 갱신 후 설치 결과를 확인합니다.
+
+초기화와 제거는 MemoryMesh 관리 영역을 대상으로 합니다. 프로젝트 자료, 사용자 지침의 다른 부분, 외부의 기존 업무 일지, 공용 스킬과 실행 환경은 보존합니다. 소유권이 불분명한 항목은 남겨 두고 정확히 보고합니다.
+
+변경할 기존 파일은 `.mesh` 밖의 `.memorymesh-backups/<시각>/` 등에 백업합니다. 같은 버전을 재적용해 바뀔 내용이 없으면 검증만 하고, 설치 기록이나 백업을 반복하지 않습니다. 최신 셋업 파일을 복사한 뒤 다시 적용해야 기존 운영 규칙과 관리 블록도 갱신됩니다.
 
 ## 기본 구성
 
-| 위치 | 역할 | 생성 시점 |
-|---|---|---|
-| `.mesh/CONFIG.md` | 업무 일지 경로와 운영 설정 | 최초 적용 시 |
-| `.mesh/PROTOCOL.md` | 모든 에이전트가 따를 공통 운영 규칙 | 최초 적용 시 |
-| `.mesh/STATE.md` | 현재 목표, 상태, 결정, 다음 행동과 위험 요소 | 최초 적용 시 |
-| `.mesh/work.log` | 기존 업무 일지가 없을 때 사용하는 기본 기록 | 필요한 경우에만 |
-| `.mesh/handoffs/` | 다른 세션이나 에이전트에 넘길 상세 인계 문서 | 실제 인계가 필요할 때 |
-| `AGENTS.md` | 에이전트가 MemoryMesh 운영 규칙을 찾는 공통 진입점 | 최초 적용 시 생성 또는 갱신 |
-| `GEMINI.md` | Antigravity CLI가 `AGENTS.md`와 프로토콜을 읽도록 안내 | 최초 적용 시 생성 또는 갱신 |
-| `CLAUDE.md` | 기존 Claude Code 지침에 프로토콜을 읽도록 안내 추가 | 파일이 이미 있을 때만 갱신 |
-
-Claude Code, Codex와 OpenCode는 `AGENTS.md`를 직접 읽으므로 `CLAUDE.md`와 `opencode.md`를 새로 만들지 않습니다. 다만 프로젝트에 `CLAUDE.md`가 이미 있으면 기존 내용을 보존한 채 MemoryMesh 관리 블록을 덧붙입니다. Claude 전용 지침이 이미 있는 프로젝트에서도 Claude Code가 `.mesh/PROTOCOL.md`를 확실히 따르게 하기 위해서입니다.
-
-## 설치 후 구조
-
-기존 업무 일지가 있는 프로젝트는 다음처럼 구성됩니다.
-
-```text
-project/
-├─ AGENTS.md
-├─ GEMINI.md
-├─ docs/
-│  └─ work-journal.md          기존 업무 일지의 예
-└─ .mesh/
-   ├─ CONFIG.md
-   ├─ PROTOCOL.md
-   └─ STATE.md
-```
-
-기존 업무 일지가 없으면 `.mesh/work.log`가 추가됩니다.
-
-```text
-.mesh/
-├─ CONFIG.md
-├─ PROTOCOL.md
-├─ STATE.md
-└─ work.log
-```
-
-`handoffs/`는 인계 문서를 처음 만들 때 생성합니다.
-
-최상위에 `CLAUDE.md`가 있던 프로젝트는 그 파일에 MemoryMesh 관리 블록이 추가될 뿐 구조는 같습니다.
-
-## 설치 방법
-
-### 1. 셋업 파일 배치
-
-`memorymesh-setup.md`를 적용할 프로젝트의 최상위 폴더에 넣습니다.
-
-```text
-my-project/
-├─ memorymesh-setup.md
-├─ src/
-└─ ...
-```
-
-### 2. AI 코딩 에이전트 실행
-
-프로젝트 최상위 폴더에서 사용할 AI 코딩 에이전트를 실행합니다.
-
-### 3. 셋업 적용 요청
-
-```text
-memorymesh-setup.md 파일의 설정 내용을 이 폴더에 적용하라.
-```
-
-에이전트는 다음 작업을 수행합니다.
-
-- 기존 업무 일지와 MemoryMesh 파일을 확인합니다.
-- 사용할 업무 일지를 하나로 정하고 `.mesh/CONFIG.md`에 기록합니다.
-- 기존 업무 일지가 없으면 `.mesh/work.log`를 만듭니다.
-- `.mesh/PROTOCOL.md`와 `.mesh/STATE.md`를 생성하거나 갱신합니다.
-- `AGENTS.md`, `GEMINI.md`의 MemoryMesh 관리 블록을 생성하거나 갱신합니다.
-- 최상위에 `CLAUDE.md`가 있으면 MemoryMesh 관리 블록을 덧붙이거나 갱신합니다. 없으면 만들지 않습니다.
-- 기존 사용자 작성 내용과 충돌 여부를 확인합니다.
-- 실제로 확인한 설치 결과만 보고합니다.
-
-기존 사용자 작성 내용은 덮어쓰지 않습니다. 관리 블록이 있는 파일은 해당 블록만 갱신합니다.
-
-### 업무 일지 선택 방식
-
-업무 일지는 다음 순서로 선택합니다.
-
-1. `.mesh/CONFIG.md`에 이미 지정된 경로
-2. 적용 요청에서 사용자가 명시한 경로
-3. 프로젝트에서 확인된 하나의 명확한 업무 일지
-4. 기존 기록이 없을 때 새로 만드는 `.mesh/work.log`
-
-후보가 여러 개여서 기준 기록을 판단하기 어려우면 에이전트가 임의로 선택하지 않고 확인을 요청합니다.
-
-## 기본 사용법
-
-설치 뒤에는 평소처럼 작업을 요청합니다.
-
-```text
-일정표 파일을 최신화하라.
-```
-
-파일을 변경하기 전에 에이전트는 다음 순서로 필요한 맥락을 확인합니다.
-
-1. `.mesh/PROTOCOL.md`
-2. `.mesh/CONFIG.md`
-3. `.mesh/STATE.md`
-4. 설정된 업무 일지의 최근 기록
-5. 인계 작업이라면 `.mesh/handoffs/`의 관련 문서
-6. 실제 작업에 필요한 원본 파일
-
-### 현재 상태 확인
-
-```text
-현재 프로젝트 진행 상태와 남은 작업을 설명하라.
-```
-
-상태, 진행률, 의견, 평가, 비교, 개수와 예 또는 아니요를 묻는 요청은 파일을 변경하지 않고 답변만 제공합니다.
-
-### 작업 상태 기록
-
-```text
-현재까지 진행 상황을 업무 일지와 현재 상태에 반영하라.
-```
-
-시간순 작업 내용은 설정된 업무 일지에 추가하고, 현재 목표나 다음 행동이 달라졌다면 `.mesh/STATE.md`도 갱신합니다.
-
-이처럼 기록 갱신을 따로 요청할 수도 있지만, 일반 작업을 요청했을 때도 그 작업에 필요한 기록은 함께 갱신합니다. 업무 일지 저장을 위해 별도로 지시할 필요는 없습니다.
-
-### 기록 편집과 저장의 자율 처리
-
-사용자가 작업을 요청하면 에이전트는 다음 기록 작업을 별도 허락, 확인 질문이나 중간 승인 없이 수행하고, 최종 응답 전에 저장을 마친 뒤 결과를 간결하게 보고합니다.
-
-- 설정된 업무 일지에 의미 있는 작업 내용과 결과를 추가합니다.
-- 현재 목표, 상태, 결정이나 다음 행동 등이 바뀌면 `.mesh/STATE.md`를 갱신합니다.
-- 상세 인계가 필요할 때만 인계 폴더와 문서를 생성하거나 갱신합니다.
-- 설치와 재적용을 요청받으면 설정 지침에 따라 필요한 구성 파일과 최상위 지침의 MemoryMesh 관리 블록을 생성하거나 갱신합니다.
-
-“업무 일지를 수정해도 되는가”, “상태 파일을 저장할 것인가”, “기록을 계속할 것인가”처럼 통상적인 기록 작업의 승인을 다시 묻지 않습니다. 기존 이력과 사용자 작성 내용을 보존하고, 질문이나 상태 확인 요청에는 기록을 남기지 않습니다.
-
-이 원칙은 실행 환경의 파일 접근 권한이나 보안 정책을 변경하지 않습니다. 실제 쓰기 제한으로 저장할 수 없으면 권한 질문을 반복하거나 승인 설정을 바꾸지 않고, 가능한 본 작업을 계속한 뒤 저장하지 못한 파일과 이유를 보고합니다. 업무 일지 후보가 여러 개여서 대상 경로를 정할 근거가 없는 경우의 확인은 기록 대상에 대한 확인이며, 선택된 파일의 편집이나 저장 승인을 요구하는 절차가 아닙니다.
-
-### 다른 세션이나 에이전트와 작업 공유
-
-```text
-현재 작업을 마감하고 다른 에이전트가 이어받을 수 있도록 정리하라.
-```
-
-간단한 작업은 업무 일지와 상태 파일만 갱신합니다. 별도의 설명이 필요한 작업에만 `.mesh/handoffs/`를 만들고 인계 문서를 저장합니다.
-
-새 세션에서는 다음처럼 요청합니다.
-
-```text
-이전 작업 기록을 확인하고 이어서 진행하라.
-```
-
-### 외부에서 변경된 내용 확인
-
-```text
-프로젝트 폴더의 현재 상태와 업무 일지를 비교하고 누락되거나 오래된 내용을 보고하라.
-```
-
-이 요청은 확인만 수행합니다. 결과를 기록에 반영하려면 다음처럼 명시합니다.
-
-```text
-프로젝트 폴더의 변경 사항을 확인하고 업무 일지와 현재 상태를 갱신하라.
-```
-
-## 자동으로 처리되지 않는 범위
-
-MemoryMesh는 프로젝트 폴더를 계속 감시하지 않습니다. 다음 내용은 자동으로 반영되지 않습니다.
-
-- 파일 탐색기나 편집기에서 직접 변경한 파일
-- Git, 압축 해제 또는 동기화 프로그램이 변경한 파일
-- 프로젝트 폴더 밖의 일정, 이메일과 클라우드 문서
-- 오래된 업무 일지의 자동 요약과 정리
-- 에이전트가 참여하지 않은 작업의 자동 기록
-
-외부 변경을 반영하려면 에이전트에게 확인 또는 갱신하도록 명시적으로 요청해야 합니다.
-
-## 요청 처리 방식
-
-### Query mode
-
-정보, 상태, 진행률, 요약, 의견, 평가, 비교, 개수와 예 또는 아니요를 묻는 요청입니다.
-
-Query mode에서는 필요한 파일만 읽고 답한 뒤 멈춥니다. 파일을 변경하거나 업무 일지를 추가하지 않습니다.
-
-### Task mode
-
-파일 생성, 수정, 삭제, 이동, 이름 변경, 프로그램 실행, 설정 변경 또는 기록 갱신을 명시적으로 요구하는 요청입니다.
-
-Task mode에서는 프로토콜과 현재 상태를 먼저 확인하고, 요청 범위에 필요한 작업만 수행합니다.
-
-해당 작업에 필요한 업무 일지, 현재 상태와 인계 문서의 갱신도 요청 범위에 포함됩니다. 에이전트는 별도 승인을 기다리지 않고 필요한 기록을 저장한 뒤 작업 결과와 함께 보고합니다.
-
-## 다시 적용하기
-
-같은 프로젝트에 최신 `memorymesh-setup.md`를 다시 적용할 수 있습니다. 기존 설치에 기록 편집과 저장의 자율 처리 원칙을 반영하려면 최신 셋업 파일을 복사한 뒤 재적용합니다. 셋업 파일만 교체해서는 이미 생성된 `.mesh/PROTOCOL.md`와 `AGENTS.md`의 관리 블록이 갱신되지 않습니다.
-
-```text
-memorymesh-setup.md 파일의 설정 내용을 이 폴더에 다시 적용하라.
-```
-
-재적용할 때는 다음 원칙을 따릅니다.
-
-- 기존 업무 일지와 사용자 작성 내용을 보존합니다.
-- MemoryMesh 관리 블록만 갱신합니다.
-- 현재 설정된 업무 일지 경로를 우선 유지합니다.
-- 누락된 필수 파일만 추가합니다.
-- 사용하지 않는 기존 파일이나 폴더를 자동으로 삭제하지 않습니다.
-- 충돌하는 사용자 지침은 보존하고 완료 보고에 표시합니다.
-- 이전 버전이 만든 `CLAUDE.md`는 그대로 두고 관리 블록만 최신 내용으로 갱신합니다.
-
-기존 `CLAUDE.md`가 `.AIMemory/`처럼 다른 업무 일지나 메모리 체계를 지정하고 있으면 기준 기록이 둘이 됩니다. 에이전트는 이를 자동으로 정리하지 않고 충돌로 보고하므로, 어느 체계를 유지할지 사용자가 정해야 합니다.
-
-## 2026년 6월 30일 버전에서 갱신하는 경우
-
-2026년 6월 30일 자 버전을 설치한 프로젝트는 먼저 최신 `memorymesh-setup.md`를 다시 적용합니다. 이 과정에서 현재 관리 블록과 경량 구조가 갱신되지만, 이전 버전이 만든 폴더와 파일은 자동으로 삭제되지 않습니다.
-
-삭제하기 전에 프로젝트를 백업하고, 다른 도구나 사용자가 해당 항목을 쓰지 않는지 확인합니다.
-
-### 수동으로 삭제해도 되는 항목
-
-| 항목 | 삭제 조건 |
+| 위치 | 역할 |
 |---|---|
-| `graphify-out/` | 자동 생성 결과에 별도로 보관할 내용이 없을 때 폴더 전체를 삭제할 수 있습니다. |
-| `.mesh/scripts/install-graphify-agents.sh` | 이전 설치용 스크립트이므로 삭제할 수 있습니다. |
-| `.mesh/scripts/` | 위 스크립트를 지운 뒤 폴더가 비어 있을 때 삭제할 수 있습니다. |
-| `.graphifyignore` | 파일 전체가 `MEMORYMESH-GRAPHIFY` 관리 블록으로만 구성되어 있을 때 삭제할 수 있습니다. 다른 규칙이 있으면 관리 블록만 삭제합니다. |
-| `.mesh/OVERVIEW.md` | 필요한 현재 상태가 `.mesh/STATE.md`로 옮겨졌는지 확인한 뒤 삭제할 수 있습니다. |
-| `.mesh/INDEX.md` | 열린 인계와 보관 기록에 필요한 색인 정보가 없는지 확인한 뒤 삭제할 수 있습니다. |
-| `.mesh/archive/`, `.mesh/cold/`, `.mesh/reports/` | 폴더가 비어 있거나 보존할 기록이 없음을 확인한 뒤 삭제할 수 있습니다. |
-| `.agents/`, `.claude/`, `.codex/` 아래의 Graphify 전용 파일이나 하위 폴더 | 이름과 내용을 확인해 Graphify 등록용임이 분명한 항목만 삭제할 수 있습니다. 상위 폴더 전체는 삭제하지 않습니다. |
+| `.mesh/CONFIG.md` | 버전, 단일 업무 일지, 기록 언어와 시간대, 조건부 스킬 출처 |
+| `.mesh/PROTOCOL.md` | 작업 시작, 기록, 재개, 스킬 활용의 공통 규칙 |
+| `.mesh/STATE.md` | 현재 목표와 결과, 결정, 검증 범위, 다음 행동 |
+| `.mesh/INSTALL.json` | 생성 파일과 관리 블록의 소유권 목록. 작업 이력을 중복 기록하지 않습니다. |
+| `.mesh/work.log` | 기존 업무 일지가 없을 때만 만드는 기본 일지 |
+| `.mesh/handoffs/` | 기본 기록만으로 부족한 상세 인계가 필요할 때 생성 |
+| `AGENTS.md` | 공통 진입점. 기존 사용자 내용과 관리 블록을 구분합니다. |
+| 필요한 제품별 안내 파일 | 실행 환경에 따라 `CLAUDE.md`, `GEMINI.md` 등의 연결을 보완합니다. |
 
-다음 항목은 계속 사용하므로 삭제하지 않습니다.
+업무 일지는 하나만 사용합니다. 명시적인 경로 변경 요청이 없으면 설정된 유효한 경로를 유지하고 추가 탐색을 끝냅니다. 설정이 없을 때 기존 일지를 찾아 활용합니다. 대상이 실제로 모호하면 설치 방식 선택과 함께 경로를 확인합니다.
 
-- `.mesh/CONFIG.md`
-- `.mesh/PROTOCOL.md`
-- `.mesh/STATE.md`
-- `.mesh/CONFIG.md`에 지정된 업무 일지
-- 진행 중인 작업을 담은 `.mesh/handoffs/`
-- MemoryMesh 관리 블록이 있는 `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`
+## 작업 중 기록과 다음 작업의 재개
 
-Graphify를 다른 프로젝트나 별도 용도로 사용하고 있다면 사용자 범위에 설치된 패키지와 공용 설정은 제거하지 않습니다. 이 안내는 해당 프로젝트에 이전 MemoryMesh Harness가 만든 항목만 대상으로 합니다.
+사용자는 본작업을 요청하면 됩니다. 통상적인 기록을 위해 별도 허락이나 저장 지시를 반복할 필요는 없습니다.
 
-## Git과 보안
+- 새 작업이나 재개 시 현재 상태와 관련 최근 기록을 읽고 이전 결정과 제약을 반영합니다.
+- 관련 원본과 가능한 경우 Git 상태를 대조합니다. 기록의 다음 행동도 이번 요청 범위 안에서 실행합니다.
+- 작업한 답변을 보내기 전에 새로 생긴 의미 있는 내용만 짧게 기록하고 저장을 확인합니다. 새 내용이 없으면 중복 기록하지 않습니다.
+- 긴 작업에서는 중요한 결정, 단계 완료, 실패 원인 확인, 검증 결과 확보 시 중간 기록을 남깁니다. `/exit` 감지에 의존하지 않습니다.
+- 일지는 시간순으로 추가하고 `STATE.md`는 현재 상태가 달라졌을 때만 갱신합니다.
+- 변경 이유, 중요한 성공과 실패, 검증 방법과 범위, 미해결 문제, 다음 행동을 필요한 만큼 남깁니다. 상세 결과는 파일 경로로 연결합니다.
+- 같은 작업에서 확인한 지침을 반복해서 읽지 않습니다. 문맥 압축, 인계, 관련 변경이나 불확실성이 생기면 다시 확인합니다.
 
-MemoryMesh 파일에는 프로젝트 맥락, 작업 이력과 결정이 포함될 수 있습니다. 공개 저장소에서는 커밋 전에 민감한 정보가 없는지 확인해야 합니다.
+짧은 추가 기록과 변경 부분 확인으로 부가 비용을 관리합니다. 전체 시간과 토큰이 얼마나 줄어드는지는 프로젝트와 활용 방식에 따라 달라지며, 비교 실측 결과는 아직 없습니다.
 
-여러 사람이 작업 상태를 공유한다면 `.mesh/`와 업무 일지를 버전 관리할 수 있습니다. 개인 기록이나 민감한 프로젝트라면 저장소에서 제외하는 편이 안전합니다.
+## 질문과 작업의 경계
 
-비밀번호, API 키, 토큰, 세션 쿠키와 불필요한 개인 정보는 MemoryMesh 파일에 기록하지 않습니다.
+정보, 상태, 의견, 평가, 비교 등을 묻는 요청은 필요한 범위만 읽고 답하며 기록을 변경하지 않습니다. 답변을 요약하거나 대화 내용을 목록으로 정리하라는 요청도 읽기 전용입니다. 파일 저장이나 기존 프로젝트 기록 갱신을 명시한 경우에만 해당 변경을 수행합니다. “삭제되어 있는가?”는 존재 여부 확인이며 삭제 명령으로 취급하지 않습니다.
 
-## 제한 사항
+프로젝트 파일이나 저장된 기록의 생성, 수정, 정리, 프로젝트 작업의 실행과 재개를 요청하면 해당 범위의 작업과 필요한 기록 갱신을 수행합니다. 답변 자체의 정리와 파일 또는 저장 기록의 정리를 구분합니다. 기록의 다음 행동이나 외부 스킬이 새로운 작업 권한을 부여하지는 않습니다.
 
-- MemoryMesh는 파일 기반 운영 규칙이므로 에이전트가 지침을 항상 따르도록 기술적으로 강제하지는 않습니다.
-- 업무 일지의 형식과 품질이 일정하지 않으면 이전 작업을 정확히 복원하기 어렵습니다.
-- 여러 에이전트가 같은 파일을 동시에 수정하면 충돌할 수 있습니다.
-- 프로젝트 폴더 밖의 자료는 자동으로 동기화되지 않습니다.
-- 긴 업무 일지는 주기적으로 요약하거나 보관해야 할 수 있습니다.
+실행 환경의 접근 제한은 준수합니다. 저장이 차단되면 가능한 작업을 계속하고 저장하지 못한 파일과 이유를 보고합니다. 승인 설정을 바꾸거나 제한을 우회하지 않습니다. 외부 배포와 Git 커밋, 푸시는 해당 작업의 허용 범위에 있을 때 수행합니다.
 
-중요한 코드와 설정 변경은 실제 원본 파일에서 확인해야 합니다.
+## 스킬은 필요한 상황에서 활용
 
-## 배포 파일
+에이전트가 작업에 맞춰 절차를 선택합니다. 기본 설치에서 전체 스킬 모음을 설치하거나 한꺼번에 읽지 않습니다. 기존의 호환 가능한 스킬을 우선 사용하고, 출처와 고정 개정 번호를 설정에 보관합니다.
 
-MemoryMesh Harness의 기본 배포 파일은 다음 두 개입니다.
+| 절차 | 역할 |
+|---|---|
+| Ponytail | 기존 기능을 재사용하고 불필요한 구현을 줄입니다. 요청한 내용과 필요한 검증, 오류 처리, 기록을 유지합니다. |
+| Graphify | 관계 파악이 어렵거나 유용한 그래프가 있을 때 구조적 지식을 정리하고 재활용합니다. 중요한 발견은 기존 기록에 연결합니다. |
+| 완료 검증 | 완료 주장에 맞는 실제 근거와 범위를 확인합니다. 일지 저장마다 전체 검사를 반복하지 않습니다. |
+| 문맥 압축 | 목적, 제약, 결정 이유, 정확한 경로, 실패, 검증 결과와 다음 행동을 보존한 요약을 만듭니다. 원본과 기존 이력을 유지합니다. |
+| 체계적 오류 분석 | 오류를 재현하고 원인과 가설을 검증하며 유용한 시도 결과를 남깁니다. |
+| 스킬 제작 | 반복해서 성공한 절차를 후보로 기록하고, 제작이 요청 범위에 포함될 때 재사용 가능한 스킬로 만듭니다. |
+
+셋업의 간결한 운영 절차는 외부 스킬 원문과 구분합니다. 필요하면 고정된 출처 개정을 참고하고, 로컬에 복사할 때 라이선스와 필요한 참조 자원도 유지합니다. 사용자 요청, 원본 보존, 읽기 전용 질문과 접근 권한을 우선합니다.
+
+Graphify는 별도 업무 일지를 만드는 용도가 아닙니다. 필요한 때 원본과 대조해 갱신하고, 자주 바뀌는 일지와 백업을 불필요하게 다시 분석하지 않습니다. 문서와 이미지의 의미 분석에는 토큰이 사용되며 코드 갱신과 비용이 다릅니다. [공식 비용 설명](https://docs.graphify.com/open-source/features/honest-token-savings)
+
+부가 스킬, 실행 환경, 네트워크가 없어도 기본 읽기와 기록, 저장, 재개는 진행합니다. 감시 서비스, Git 훅, 데이터베이스, 공용 설정 변경은 기본 기록의 필수 조건이 아닙니다.
+
+## 초기 적용부터 에이전트 호환성 확인
+
+| 제품 | 연결 기준 |
+|---|---|
+| Codex | `AGENTS.md`와 관련 `AGENTS.override.md`의 우선순위를 확인합니다. [공식 문서](https://learn.chatgpt.com/docs/agent-configuration/agents-md) |
+| Claude Code | 버전, 설정과 기존 `CLAUDE.md` 계열에 따라 `AGENTS.md` 로딩을 확인하고, 필요하면 `@AGENTS.md`를 구성합니다. [공식 문서](https://code.claude.com/docs/en/memory#agentsmd) |
+| Antigravity | App, CLI, IDE의 실제 환경에서 `AGENTS.md`, `GEMINI.md` 등의 규칙을 확인합니다. Gemini CLI와 같은 제품으로 가정하지 않습니다. [공식 문서](https://antigravity.google/docs/rules/) |
+| 그 밖의 에이전트 | 공통 파일 절차를 수행하고 확인된 프로젝트 지침 진입점에 연결합니다. 자동 로딩을 확인하지 못한 부분은 보고합니다. |
+
+스킬 검색 경로와 호출 방식도 환경에 맞춥니다. 전용 명령이나 훅이 없는 환경에서는 운영 규칙을 직접 따라 작업합니다. 파일 생성 확인과 새 세션에서 지침이 실제로 불러와진 확인은 구분합니다.
+
+## 배포와 개편 내역
+
+공개 저장소에 올리는 파일은 다음 두 개입니다.
 
 ```text
 README.md
 memorymesh-setup.md
 ```
 
-사용자는 `memorymesh-setup.md`를 대상 프로젝트의 최상위 폴더에 복사하고 에이전트에게 적용을 지시합니다.
+프로젝트별 기록, 백업, 스킬 캐시, 로컬 검증 자료는 배포에 포함하지 않습니다. 이 저장소의 로컬 추적과 커밋, 푸시 제한 및 사용자 단독 작성자 구성을 유지합니다. 공헌자나 공동 작성자 표기를 자동으로 추가하지 않습니다.
+
+셋업, README, 릴리스 제목과 본문, 첨부 파일에는 사용자의 이메일, 실명, 연락처, 주소, 로컬 계정명과 개인 경로 등 개인 식별 정보를 포함하지 않습니다. 계정에 연결된 비공개 이메일 대체 주소도 문서에 넣지 않습니다. 예시는 중립적인 자리표시자와 프로젝트 기준 상대 경로를 사용합니다. 인증 정보, Git 작성자 설정과 로컬 검증 출력도 배포 문구에 복사하지 않습니다.
+
+게시 전에는 실제 최종 내용을 점검합니다. 자동 패턴 검사는 직접 검토를 보조하며, 모든 개인 정보를 검출했다는 보장은 하지 않습니다.
+
+릴리스 노트는 한국어와 추가 영문 설명으로 GitHub Releases 본문에 제공할 수 있습니다. 문서 개편만으로 릴리스를 게시하거나 원격에 푸시하지 않습니다.
+
+### 2026. 11. 08. 개편
+
+- 셋업을 영어로 작성하고 초기 적용 공통 절차와 제품별 연결을 구분했습니다.
+- 설치 버전과 한 번의 방식 선택, 소유권 목록, 백업과 초기화 및 제거를 추가했습니다.
+- 매 작업 답변 전 기록과 중간 저장, 이전 기록을 반영하는 재개를 구체화했습니다.
+- 조건부 스킬 활용과 고정 출처, 부가 도구가 없을 때의 기본 동작을 정의했습니다.
+- 중복 탐색과 반복 기록을 줄이고 검증 범위와 한계를 명시하도록 했습니다.
+
+문서와 템플릿 검사만으로 모든 제품과 버전에서 초기 적용을 실행했다고 주장하지 않습니다. 실제 수행한 검증과 미검증 범위를 구분하며, 성능과 토큰 절감 수치는 별도 측정이 필요합니다.
+
+버전 정보가 없거나 이전 Graphify 구성이 있는 설치는 기존 내용 유지 방식으로 확인할 수 있습니다. 공용 Graphify 패키지, 다른 용도의 그래프, 사용자 파일은 자동으로 제거하지 않습니다. 소유권이 불분명한 잔여 항목은 목록으로 보고합니다.
+
+## English guide
+
+MemoryMesh records useful work during execution and applies that evidence when work begins again. It supports sequential continuation across sessions and agents through one work log, concise current state, and detailed handoffs only when needed.
+
+Copy memorymesh-setup.md to the project root and ask a file-capable agent:
 
 ```text
-memorymesh-setup.md 파일의 설정 내용을 현재 작업 폴더에 적용하라.
+Apply memorymesh-setup.md to this project.
 ```
 
-설치가 끝난 뒤 셋업 파일은 보관하거나 삭제할 수 있습니다. 나중에 갱신하려면 최신 셋업 파일을 다시 배치하고 적용합니다.
+The English setup is the normative execution procedure. Core file operations need no preinstalled plugin, skill, shell, Git, Python, or Node.js. The agent detects the host and existing installation, shows a concrete plan, and asks once for the applicable action: Install, Preserve and apply, Back up and reset, Remove, or Cancel. An explicit choice is not confirmed again.
+
+Cancel stops immediately without backups or record changes. Remove performs only backup, removal, and removal checks; it does not create an installation first. Reset completes backup/archive before rebuilding. Install and Preserve and apply perform only their necessary setup steps. Compare date-based revisions by date and numeric suffix. An older setup is a downgrade candidate, not an upgrade, and may replace a newer installation only when that downgrade is explicitly selected in the same mode choice.
+
+Preserve user instructions and history. Core records are CONFIG, PROTOCOL, STATE, an ownership manifest, and one log. An unchanged reapplication duplicates neither entries nor state. Reset/removal back up latest records outside .mesh and affect only identifiable owned resources/blocks. Shared tools and unrelated user content remain intact.
+
+Before every final task response, save a concise delta for new meaningful work and confirm persistence; checkpoint during long tasks. Update STATE only when current information changes. Queries remain read-only. At a new task, consult relevant prior records, apply decisions and constraints, and verify relevant originals. Records retain the project's language and format.
+
+Answer-only summaries, reformatted answers, and discussion lists remain read-only and create no record entry. Explicit requests to change project files, execute project operations, or save/update stored records are tasks. The word organize alone does not authorize file changes.
+
+Conditional procedures cover Ponytail, Graphify, evidence-based completion, context compression, systematic debugging, and skill creation within scope. Reuse compatible installed skills and load only relevant instructions. Optional tools do not block core continuity. No universal performance or token-saving claim is made.
+
+Adapters account for Codex overrides, Claude imports/loading behavior, and Antigravity rules and skill discovery. File creation, documented compatibility, and actual fresh-session execution are distinct validation levels. Report blocked saves and untested host behavior accurately.
+
+Distribution and release content must exclude the user's email addresses, real name, contact details, personal identifiers, local account names, and private absolute paths. Use neutral placeholders and project-relative paths. Never copy account configuration, credentials, or private local logs into public documents. Review final content directly; pattern scans are supplementary.
+
+Distribution remains exactly README.md and memorymesh-setup.md. Local records, backups, caches, and tests stay outside publication. README and release notes are Korean-first with English explanations; setup stays English. Publish release notes in the GitHub Releases body only when a release is requested. This document revision does not itself push or publish.
