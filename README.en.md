@@ -52,7 +52,7 @@ Settings and records are kept in the project's `.mesh/` folder. Existing user co
 | `CLAUDE.md`, `GEMINI.md` | Connect Claude Code and Gemini CLI to the same shared instructions. They contain only a short reference to `AGENTS.md`, not separate instructions, so the instructions are maintained in `AGENTS.md` alone. They are always prepared, whichever agent applies the setup. If a file exists, its user content is kept and only the reference is added. |
 | `AGENTS.override.md` | MemoryMesh guidance is added only if this file already exists. It is never created. |
 | `.mesh/handoffs/` | Created only when a detailed handoff document is needed. |
-| `.memorymesh-backups/` | The default backup location when existing files change. A `.gitignore` inside the folder keeps backups out of Git. An explicitly configured backup location takes precedence. |
+| `.memorymesh-backups/` | The default backup location when existing files change. An explicitly configured backup location takes precedence. |
 
 You do not need to create or edit these files yourself. If optional skill files are added, their paths are included in the notice as well.
 
@@ -73,7 +73,6 @@ Requests for information, opinions, or answer organization do not change files. 
 - While a tool is running, the agent may be unable to send progress updates until control returns.
 - During setup, only the current agent's instruction loading can be confirmed. Entry points for other agents are prepared, and their actual loading is confirmed the first time you use them.
 - If an agent's settings disable project instructions or change the instruction filename, the entry points are not read automatically. In that case, ask the agent once to read and follow `.mesh/PROTOCOL.md`.
-- In a Git repository, `.mesh/` records and the work log are committed like other project files. For a public repository, review them before publishing or add them to `.gitignore`. The backup folder is excluded from Git automatically.
 - The optional feature that downloads reviewed external skill sources runs only with your approval. Core features work without downloads.
 
 ## License
