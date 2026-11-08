@@ -19,7 +19,7 @@ It records progress, decisions, verification results, and remaining work in the 
 Apply memorymesh-setup.md to this project.
 ```
 
-Use an agent that can read and write project files, such as Codex, Claude Code, or Antigravity. Basic installation requires no separate server or skill installation.
+Use an agent that can read and write project files, such as Codex, Claude Code, Gemini CLI, or Antigravity. Basic installation requires no separate server or skill installation.
 
 Use the same request when starting for the first time or changing an existing configuration. The agent checks the existing installation, version, and records, shows its findings and the available actions, and asks once what you want to do. Simply choose the desired action from the options it presents.
 
@@ -48,16 +48,17 @@ Settings and records are kept in the project's `.mesh/` folder. Existing user co
 | `.mesh/STATE.md` | Summarizes current progress and remaining work. |
 | `.mesh/INSTALL.json` | Records the installed components so later updates or removal can identify them. |
 | Existing work log or `.mesh/work.log` | Stores work history. An existing log is reused; the default log is created only when no existing one is available. |
-| `AGENTS.md` | Connects the agent to shared instructions. If the file exists, its MemoryMesh guidance is added or updated. |
-| `AGENTS.override.md`, `CLAUDE.md`, or `GEMINI.md` when needed | Complements instruction loading for the active agent environment. These files are not all created unconditionally. |
+| `AGENTS.md` | The shared instruction entry point read by most agents, such as Codex and Antigravity. If the file exists, its MemoryMesh guidance is added or updated. |
+| `CLAUDE.md`, `GEMINI.md` | Connect Claude Code and Gemini CLI to the same shared instructions. They contain only a short reference to `AGENTS.md`, not separate instructions, so the instructions are maintained in `AGENTS.md` alone. They are always prepared, whichever agent applies the setup. If a file exists, its user content is kept and only the reference is added. |
+| `AGENTS.override.md` | MemoryMesh guidance is added only if this file already exists. It is never created. |
 | `.mesh/handoffs/` | Created only when a detailed handoff document is needed. |
-| `.memorymesh-backups/` | The default backup location when existing files change. An explicitly configured backup location takes precedence. |
+| `.memorymesh-backups/` | The default backup location when existing files change. A `.gitignore` inside the folder keeps backups out of Git. An explicitly configured backup location takes precedence. |
 
 You do not need to create or edit these files yourself. If optional skill files are added, their paths are included in the notice as well.
 
 ## Use
 
-After installation, request work as usual. When connecting another agent for the first time, use the same application request in the same project folder. The agent preserves existing records and checks the instruction connection so you can continue working.
+After installation, request work as usual. Whichever agent applied the setup, you can continue in other agents, such as Codex, Claude Code, Gemini CLI, or Antigravity, without applying it again. If you suspect a connection problem, run the same application request in that agent to check it and fill in only what is missing.
 
 - At the start of a new task, the agent reads prior records and applies previous decisions and constraints.
 - It saves meaningful progress during work and records new information before responding with task results. You do not need to repeat instructions to save records.
@@ -70,3 +71,11 @@ Requests for information, opinions, or answer organization do not change files. 
 - Work resumes from saved records. Information that was not saved before an abrupt exit may not carry over.
 - Automatic recording and resumption may be limited when the agent cannot read project instructions or save files.
 - While a tool is running, the agent may be unable to send progress updates until control returns.
+- During setup, only the current agent's instruction loading can be confirmed. Entry points for other agents are prepared, and their actual loading is confirmed the first time you use them.
+- If an agent's settings disable project instructions or change the instruction filename, the entry points are not read automatically. In that case, ask the agent once to read and follow `.mesh/PROTOCOL.md`.
+- In a Git repository, `.mesh/` records and the work log are committed like other project files. For a public repository, review them before publishing or add them to `.gitignore`. The backup folder is excluded from Git automatically.
+- The optional feature that downloads reviewed external skill sources runs only with your approval. Core features work without downloads.
+
+## License
+
+[MIT License](LICENSE)

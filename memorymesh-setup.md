@@ -1,7 +1,7 @@
 # MemoryMesh Setup
 
-- Setup revision: `2026-11-08.3`
-- Protocol revision: `4`
+- Setup revision: `2026-11-08.4`
+- Protocol revision: `5`
 - Preserve real paths, names, quoted user text, and the project's record language.
 
 ## 1. Execute this file
@@ -41,7 +41,7 @@ The distribution file alone is not installation evidence. Investigate old OVERVI
 
 ## 3. Choose the action once
 
-In the user's language, briefly explain the detected installation, recommend the applicable action, and present the choices with what will be preserved and the changes needed to choose safely. Keep implementation details in the records unless they affect the user's decision. Include any optional dependency or external-service addition requiring a choice in this same question.
+In the user's language, briefly explain the detected installation, recommend the applicable action, and present the choices with what will be preserved and the changes needed to choose safely. Keep implementation details in the records unless they affect the user's decision. Include any optional dependency or external-service addition requiring a choice in this same question. If the target is a Git repository, briefly note in the same message that .mesh/ records and the work log are committed like other project files unless the user ignores them, so they should be reviewed before publishing; do not change the project's ignore rules for .mesh/ without a request.
 
 | Action | Meaning |
 |---|---|
@@ -55,7 +55,7 @@ Offer Install/Cancel for a new target; offer Preserve and apply/Back up and rese
 
 After this choice, complete reads, backups, edits, saves, and checks directly. Respect enforced access controls. If saving is blocked, continue permitted work, report unsaved paths, and avoid repeated approval requests or changes to permission settings.
 
-After the choice and before writing, briefly list the actual project-relative files/folders to create, update, or remove and the backup location. Include conditional host entry files and optional skill resources only when part of this operation. This is a progress notice, not another approval request. During a longer operation, give short updates at meaningful stages, such as checking existing configuration, backing up changes, writing files, and verifying saved results. Describe only stages actually reached. Finish by reporting the actual completed paths and any incomplete items.
+After the choice and before writing, briefly list the actual project-relative files/folders to create, update, or remove and the backup location. Include the AGENTS.md, CLAUDE.md, and GEMINI.md entry points (and an existing AGENTS.override.md) whenever they will change, and optional skill resources only when part of this operation. This is a progress notice, not another approval request. During a longer operation, give short updates at meaningful stages, such as checking existing configuration, backing up changes, writing files, and verifying saved results. Describe only stages actually reached. Finish by reporting the actual completed paths and any incomplete items.
 
 Apply the progress/stall rules in the PROTOCOL template during setup too, using available valid CONFIG thresholds or the 60/120-second defaults until configuration exists. No extra runtime or timer service is required.
 
@@ -75,7 +75,7 @@ This section applies only to Install, necessary Preserve and apply changes, and 
 
 Common managed-block rule: create an absent file; replace exactly one ordered start/end pair; otherwise append a block while preserving surrounding content. Duplicate, reversed, or incomplete markers are a conflict: preserve the file and report it instead of guessing. Do not report a conflicted installation as complete.
 
-Before changing an existing file, back it up if its content will change. Prefer a native byte-preserving copy. With text-only tools, preserve the exposed text and known encoding/line endings and record the backup's fidelity; do not claim a byte-exact copy without evidence. Do not perform a destructive reset/removal if a reliably restorable backup cannot be made. Use a local .memorymesh-backups/<timestamp>/ outside .mesh, or an explicitly configured location. Resolve targets before recursive operations. Never copy a folder into itself, include older backups in a new backup, or remove an unchecked path. Keep backups local; do not stage or publish them.
+Before changing an existing file, back it up if its content will change. Prefer a native byte-preserving copy. With text-only tools, preserve the exposed text and known encoding/line endings and record the backup's fidelity; do not claim a byte-exact copy without evidence. Do not perform a destructive reset/removal if a reliably restorable backup cannot be made. Use a local .memorymesh-backups/<timestamp>/ outside .mesh, or an explicitly configured location. When creating the default backup folder, also create .memorymesh-backups/.gitignore containing the single line `*` if it is absent, so Git ignores every backup without editing the project's own ignore files; record it in INSTALL as owned. Resolve targets before recursive operations. Never copy a folder into itself, include older backups in a new backup, or remove an unchecked path. Keep backups local; do not stage or publish them.
 
 Create .mesh/CONFIG.md, PROTOCOL.md, STATE.md, and INSTALL.json. Create the selected log only if absent. Create handoff folders, skill caches, and native registrations only when needed. Preserve existing encoding and line endings where possible; new text is UTF-8. Existing records retain their language/style; new records use the project's language or the user's language when no convention exists.
 
@@ -83,19 +83,20 @@ Replace template placeholders with verified values. Identify genuinely unknown i
 
 ### CONFIG template
 
-Preserve valid existing progress thresholds unless the user requests a change; use the defaults below when missing, and honor stricter host feedback requirements.
+Preserve valid existing progress thresholds and external_skill_fetch values unless the user requests a change; use the defaults below when missing, and honor stricter host feedback requirements.
 
 ```markdown
 # MemoryMesh Configuration
 
 <!-- MEMORYMESH:CONFIG:START -->
-setup_revision: 2026-11-08.3
-protocol_revision: 4
+setup_revision: 2026-11-08.4
+protocol_revision: 5
 work_log: <project-relative path>
 work_log_owner: <existing or memorymesh>
 record_language: <project language or user's language>
 timezone: <known project/user timezone; otherwise explicit UTC>
-skill_policy: conditional; reuse first; load only relevant instructions
+skill_policy: conditional; reuse installed first; load only relevant instructions
+external_skill_fetch: ask
 progress_notice_after_seconds: 60
 stall_review_after_seconds: 120
 <!-- MEMORYMESH:CONFIG:END -->
@@ -156,7 +157,7 @@ Keep STATE concise: objective, current result, settled constraints, verification
 Simple continuation needs only the log and STATE. If extra detail is needed, create .mesh/handoffs/handoff_<topic>_<timestamp>.<agent>.md with exact files/identifiers, decisions/reasons, failed attempts, verification methods/results, required tools, remaining work, and the next action. Link it from STATE. Mark consumed or superseded handoffs in STATE; do not treat old transfers as active or silently overwrite them.
 
 ## Conditional procedures
-Use relevant procedures autonomously within scope. Reuse compatible installed skills first. Read CONFIG's source registry and only relevant skill/references when needed. Cache missing reviewed sources project-locally at the pinned revision, with licenses and required resources, only within the installation's stated scope and available permissions. Record source/revision and execution method when continuation depends on them. Do not install an entire catalog, overwrite unrelated skills, or silently update pins.
+Use relevant procedures autonomously within scope. Reuse compatible installed skills first; otherwise the concise procedures below are sufficient for core continuity. Read CONFIG's source registry and only relevant skill/references when needed. Fetching an upstream source over the network depends on CONFIG's external_skill_fetch: `ask` (default) requires the user's approval for that fetch, `allowed` records standing approval, and `off` forbids it. Cache an approved source project-locally at the pinned revision, with licenses and required resources, only within available permissions, and report the cached path. Record source/revision and execution method when continuation depends on them. Do not install an entire catalog, overwrite unrelated skills, or silently update pins.
 
 Ponytail: during implementation, reuse existing solutions and remove unnecessary complexity while completing the requested scope. Preserve validation, error handling, accessibility, and necessary records.
 
@@ -218,14 +219,17 @@ INSTALL.json is an ownership ledger, not a second work log. This JSON example de
 ```json
 {
   "manifest_version": 1,
-  "setup_revision": "2026-11-08.3",
-  "protocol_revision": 4,
+  "setup_revision": "2026-11-08.4",
+  "protocol_revision": 5,
   "work_log": "<configured relative path>",
   "work_log_owner": "<existing or memorymesh>",
   "directories_created": [".mesh"],
   "resources": [
     {"path": ".mesh/CONFIG.md", "kind": "file", "ownership": "created", "installed_sha256": null},
-    {"path": "AGENTS.md", "kind": "block", "marker": "MEMORYMESH", "file_created": false, "installed_sha256": null}
+    {"path": "AGENTS.md", "kind": "block", "marker": "MEMORYMESH", "file_created": false, "installed_sha256": null},
+    {"path": "CLAUDE.md", "kind": "block", "marker": "MEMORYMESH:CLAUDE", "file_created": true, "installed_sha256": null},
+    {"path": "GEMINI.md", "kind": "block", "marker": "MEMORYMESH:GEMINI", "file_created": true, "installed_sha256": null},
+    {"path": ".memorymesh-backups/.gitignore", "kind": "file", "ownership": "created", "installed_sha256": null}
   ],
   "skills": [],
   "last_backup": null
@@ -236,7 +240,9 @@ For a preexisting shared file, ledger only its managed block. A preexisting reco
 
 Create the default log with a short append-only header only if needed. Append one INSTALL, UPGRADE, REAPPLY, or RESET entry for actual changes. An unchanged reapplication is verification only: no duplicate SETUP entry, timestamp churn, repeated backup, or needless STATE rewrite.
 
-## 5. Connect the active host
+## 5. Connect every supported host
+
+The result must not depend on which agent applies this file. Whatever the active host, prepare the entry points below for all supported hosts so that Codex, Claude Code, Gemini CLI, Antigravity, and other AGENTS.md-aware agents can continue from the same records without reapplying this setup.
 
 Use root AGENTS.md as the common entry point, preserving existing content with this block:
 
@@ -251,14 +257,14 @@ Follow CONFIG/PROTOCOL progress rules: default to a useful update after about 60
 <!-- MEMORYMESH:END -->
 ```
 
-| Host | Instruction connection | Project skill discovery |
-|---|---|---|
-| Codex | AGENTS.md; check a relevant AGENTS.override.md because it may replace that directory's normal entry | `.agents/skills/<name>/SKILL.md` |
-| Claude Code | Confirm AGENTS.md loading; existing CLAUDE files, settings, and older versions may require a root CLAUDE.md import | `.claude/skills/<name>/SKILL.md` |
-| Antigravity | AGENTS.md or GEMINI.md; distinguish App, CLI, and IDE behavior from Gemini CLI | `.agents/skills/<name>/SKILL.md`; legacy locations only as needed |
-| Other/unknown | Use AGENTS.md and a documented native entry if available; execute this file through ordinary file tools | Discover supported locations or follow the protocol directly |
+Then apply each root entry point below with the common managed-block rule. Loading the same instructions twice through more than one entry point is harmless.
 
-For Codex, add the common block to an applicable root override if the normal root file is ignored; do not edit ancestor/global overrides. For Claude, inspect relevant CLAUDE files and loading behavior. If reliable loading is not established, create a minimal root CLAUDE.md or append this block:
+| File | Rule | Reason |
+|---|---|---|
+| AGENTS.md | Always: the common block above | Codex, Antigravity, Claude Code when no CLAUDE file applies, and other AGENTS.md-aware agents |
+| CLAUDE.md | Always: the Claude bridge below, unless an existing root CLAUDE.md or .claude/CLAUDE.md already imports AGENTS.md | Claude Code reads AGENTS.md only when no CLAUDE.md, .claude/CLAUDE.md, or CLAUDE.local.md exists in the working directory or any ancestor folder, and older versions do not read AGENTS.md directly. The import works in every case. |
+| GEMINI.md | Always: the Gemini bridge below, unless an existing root GEMINI.md already imports or explicitly reads AGENTS.md | Gemini CLI reads GEMINI.md by default and AGENTS.md only when configured; Antigravity reads either file |
+| AGENTS.override.md | Only when it already exists at the root: add the common block there as well; never create it | Codex reads it instead of AGENTS.md in that folder; creating one would hide AGENTS.md |
 
 ```markdown
 <!-- MEMORYMESH:CLAUDE:START -->
@@ -266,17 +272,27 @@ For Codex, add the common block to an applicable root override if the normal roo
 <!-- MEMORYMESH:CLAUDE:END -->
 ```
 
-For Antigravity/Gemini environments, reuse the applicable entry; add root GEMINI.md only when needed or already present. Use verified native imports when supported. The portable bridge is:
-
 ```markdown
 <!-- MEMORYMESH:GEMINI:START -->
-Read AGENTS.md and .mesh/PROTOCOL.md before authorized project work. Follow the read-only query rule and per-task-response recording rule.
+@./AGENTS.md
+If the line above was not expanded, read AGENTS.md and .mesh/PROTOCOL.md before authorized project work and follow them.
 <!-- MEMORYMESH:GEMINI:END -->
 ```
 
-Do not generate every product's configuration unconditionally. A later host may add its necessary local bridge within an authorized task and update the ledger. Keep common records readable across hosts. Do not duplicate the full protocol in bridges. A host setting blocking project instructions cannot be repaired by creating more files; report it. Native skill registration is optional; direct routing remains available.
+Do not edit ancestor or global instruction files, overrides, or settings. Keep common records readable across hosts. Bridges contain only the reference blocks shown above: do not copy MemoryMesh rules or host-specific variants into them, so AGENTS.md remains the single source of instructions.
 
-When this setup is applied from a different host, read the existing shared CONFIG, PROTOCOL, STATE, and recent log before creating anything. Reuse these records and verify the new host can find the common entry, adding only its necessary bridge under the selected mode. A host switch alone does not reset project state or start a second log. If native loading is blocked, explain the specific limitation and explicitly read the project records for the authorized session without claiming automatic loading in future sessions.
+| Host | Project skill discovery |
+|---|---|
+| Codex | `.agents/skills/<name>/SKILL.md` |
+| Claude Code | `.claude/skills/<name>/SKILL.md` |
+| Antigravity | `.agents/skills/<name>/SKILL.md`; legacy locations only as needed |
+| Gemini CLI and other/unknown | Use a verified native location if available; otherwise follow the protocol directly |
+
+The entry points above are the only host files created unconditionally. Do not generate other product-specific configuration, such as settings, hooks, rule folders, or native skill registrations, unless needed and within the selected mode. Native skill registration is optional; direct routing remains available.
+
+Creating a file does not prove that a host loads it. Confirm loading only for the active host when it can be observed, and report the other hosts' entry points as prepared but unverified in this session. A host setting that disables project instructions or excludes these filenames, such as Claude Code's project-instructions setting or a Gemini CLI context.fileName list without GEMINI.md, cannot be repaired by creating more files. Report that limit instead of changing user or global settings; in that environment the user can ask the agent once to read .mesh/PROTOCOL.md.
+
+Reapplying from another host is not required. If this setup is applied again from a different host, read the existing shared CONFIG, PROTOCOL, STATE, and recent log before creating anything, reuse them, check that every entry point above is present, and repair only missing parts under the selected mode. A host switch alone does not reset project state or start a second log.
 
 ## 6. Skill source registry
 
@@ -297,7 +313,7 @@ When caching an upstream bundle, retain its license/attribution and required res
 
 Reset preparation: back up latest owned records/configuration first. Preserve an external/user-owned log and its history. Archive a MemoryMesh-owned log and handoffs if starting a new active record. Do not replace configuration, STATE, or entry points before backup/archive succeeds. Then return to sections 4, 5, and 6 to rebuild the managed area and STATE from actual evidence, retain one active log, and replace only MemoryMesh instruction blocks. Link the archive from the new RESET entry after the active log is ready. Finish with section 8 installation checks.
 
-Remove: use the confirmed plan and ledger. Do not execute the creation, upgrade, adapter, or registry steps in sections 4, 5, and 6. Back up latest records outside .mesh first. Remove owned files/caches, uniquely identified managed blocks, and directories that are then empty. Delete a created bridge only if it contains nothing else. Retain the distribution setup file, project files, user-owned logs, shared skills/runtimes, unrelated configuration/hooks, and backups. Never delete an entire .agents, .claude, .codex, or .gemini tree. Preserve uncertain ownership or added user content and report exact remnants. Report partial removal if active components remain. Continue only to section 8 removal checks, without recreating removed records.
+Remove: use the confirmed plan and ledger. Do not execute the creation, upgrade, adapter, or registry steps in sections 4, 5, and 6. Back up latest records outside .mesh first. Remove owned files/caches, uniquely identified managed blocks, and directories that are then empty. Delete a created bridge only if it contains nothing else. Retain the distribution setup file, project files, user-owned logs, shared skills/runtimes, unrelated configuration/hooks, and backups together with the backup folder's .gitignore. Never delete an entire .agents, .claude, .codex, or .gemini tree. Preserve uncertain ownership or added user content and report exact remnants. Report partial removal if active components remain. Continue only to section 8 removal checks, without recreating removed records.
 
 Legacy/partial: without a ledger, identify blocks conservatively, back up before adopting them, and claim only proven ownership. Old Graphify installations are not automatically owned. Repair missing records without duplicating the log. If a write fails partway, retain a completed/unresolved path list and backup; stop dependent destructive steps and never report success for an incomplete operation.
 
@@ -306,7 +322,7 @@ Legacy/partial: without a ledger, identify blocks conservatively, back up before
 Before the final response, verify only the checks applicable to the selected action. Never recreate removed files to satisfy installation checks. Cancel stops in section 3 and performs no write or log update.
 
 - Install/Preserve and apply/Back up and reset: required files, real CONFIG values, selected revisions, valid INSTALL JSON, and one existing configured log.
-- Those installation actions: one ordered pair for each applicable block; preserved surrounding text/history; appropriate host entry point and relevant skill availability. Distinguish file creation from actual fresh-session loading.
+- Those installation actions: one ordered pair for each applicable block; preserved surrounding text/history; every section 5 entry point present or already satisfied by an existing import, and relevant skill availability. Distinguish file creation from actual fresh-session loading; only the active host's loading can be confirmed in this session.
 - Those installation actions: concise current STATE, valid handoff links, and an operation entry only for actual changes. An unchanged reapplication must leave records unchanged.
 - Remove: readable backup, checked ownership, intended owned resources/blocks absent, shared resources and user content retained, and exact remaining active components. A new CONFIG, STATE, INSTALL, or log is not required.
 - All actions that write: saved content read back or equivalent persistence evidence; exact partial saves and access failures. Reset also requires a readable pre-change backup/archive.
