@@ -1,6 +1,6 @@
 # MemoryMesh Setup
 
-- Setup revision: `2026-11-08.6`
+- Setup revision: `2026-11-08.7`
 - Protocol revision: `7`
 - Preserve real paths, names, quoted user text, and the project's record language.
 
@@ -89,7 +89,7 @@ Preserve valid existing progress thresholds and external_skill_fetch values unle
 # MemoryMesh Configuration
 
 <!-- MEMORYMESH:CONFIG:START -->
-setup_revision: 2026-11-08.6
+setup_revision: 2026-11-08.7
 protocol_revision: 7
 work_log: <project-relative path>
 work_log_owner: <existing or memorymesh>
@@ -219,7 +219,7 @@ INSTALL.json is an ownership ledger, not a second work log. This JSON example de
 ```json
 {
   "manifest_version": 1,
-  "setup_revision": "2026-11-08.6",
+  "setup_revision": "2026-11-08.7",
   "protocol_revision": 7,
   "work_log": "<configured relative path>",
   "work_log_owner": "<existing or memorymesh>",
@@ -290,7 +290,7 @@ Do not edit ancestor or global instruction files, overrides, or settings. Keep c
 
 The entry points above are the only host files created unconditionally. Do not generate other product-specific configuration, such as settings, hooks, rule folders, or native skill registrations, unless needed and within the selected mode. Native skill registration is optional; direct routing remains available.
 
-Creating a file does not prove that a host loads it. Confirm loading only for the active host when it can be observed, and report the other hosts' entry points as prepared but unverified in this session. A host setting that disables project instructions or excludes these filenames, such as Claude Code's project-instructions setting or a Gemini CLI context.fileName list without GEMINI.md, cannot be repaired by creating more files. Report that limit instead of changing user or global settings; in that environment the user can ask the agent once to read .mesh/PROTOCOL.md.
+Creating a file does not prove that a host loads it. For the active host, inspect readable project and user settings that control instruction loading, read-only, and confirm loading when it can be observed; and report the other hosts' entry points as prepared but unverified in this session. A host setting that disables project instructions or excludes these filenames, such as Claude Code's project-instructions setting or a Gemini CLI context.fileName list without GEMINI.md, cannot be repaired by creating more files. Report that limit instead of changing user or global settings; in that environment the user can ask the agent once to read .mesh/PROTOCOL.md.
 
 Reapplying from another host is not required. If this setup is applied again from a different host, read the existing shared CONFIG, PROTOCOL, STATE, and recent log before creating anything, reuse them, check that every entry point above is present, and repair only missing parts under the selected mode. A host switch alone does not reset project state or start a second log.
 

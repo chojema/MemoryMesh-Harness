@@ -58,7 +58,7 @@ You do not need to create or edit these files yourself. If optional skill files 
 
 ## Use
 
-After installation, request work as usual. Whichever agent applied the setup, you can continue in other agents, such as Codex, Claude Code, Gemini CLI, or Antigravity, without applying it again. If you suspect a connection problem, run the same application request in that agent to check it and fill in only what is missing.
+After installation, request work as usual. Whichever agent applied the setup, you can continue in other agents, such as Codex, Claude Code, Gemini CLI, or Antigravity, without applying it again. If an agent does not seem to know about earlier work, run the same application request in that agent. It checks the connection and fills in what is missing, or tells you if it finds that its settings prevent the connection.
 
 - At the start of a new task, the agent reads prior records and applies previous decisions and constraints.
 - It saves meaningful progress during work and records new information before responding with task results. You do not need to repeat instructions to save records.
@@ -69,10 +69,8 @@ Requests for information, opinions, or answer organization do not change files. 
 ## Notes and limitations
 
 - Work resumes from saved records. Information that was not saved before an abrupt exit may not carry over.
-- Automatic recording and resumption may be limited when the agent cannot read project instructions or save files.
+- Automatic recording and resumption may not work if an agent's settings prevent it from reading project instructions or saving files.
 - While a tool is running, the agent may be unable to send progress updates until control returns.
-- During setup, only the current agent's instruction loading can be confirmed. Entry points for other agents are prepared, and their actual loading is confirmed the first time you use them.
-- If an agent's settings disable project instructions or change the instruction filename, the entry points are not read automatically. In that case, ask the agent once to read and follow `.mesh/PROTOCOL.md`.
 - Reviewed external skill sources are downloaded only when you request it, and the agent does not ask about it during use. Core features work without downloads.
 
 ## License
