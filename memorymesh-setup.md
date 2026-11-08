@@ -1,7 +1,7 @@
 # MemoryMesh Setup
 
-- Setup revision: `2026-11-08.1`
-- Protocol revision: `2`
+- Setup revision: `2026-11-08.3`
+- Protocol revision: `4`
 - Preserve real paths, names, quoted user text, and the project's record language.
 
 ## 1. Execute this file
@@ -11,6 +11,8 @@ When asked to apply this file, execute the procedure in the target project. The 
 MemoryMesh records useful work during execution and applies that evidence when new work begins. The default is sequential continuation by the same or another agent, not parallel orchestration. The active agent executes these file-based rules; MemoryMesh is not a background service.
 
 Inspect first, show a concrete plan, and obtain one installation-mode choice. An explicit mode already supplied by the user counts as that choice. Ordinary recording after installation needs no repeated confirmation. A request to explain or evaluate this file is read-only, not permission to install it.
+
+Discussing whether a setup change would be useful does not authorize that change. A clear instruction to apply or modify the setup authorizes the specified work. In a mixed request, execute explicit instructions and answer separate opinions without implementing their proposals.
 
 One generic request to apply this file is the entry point for all applicable actions. Inspect the project before asking the user to choose. Do not require the user to identify the installation state/version, choose a mode in advance, or write separate update/reset/remove commands. A generic apply request is not a preselected installation mode. Derive the available choices from inspection and ask for the desired outcome once. Honor a voluntarily supplied explicit choice without asking again.
 
@@ -39,7 +41,7 @@ The distribution file alone is not installation evidence. Investigate old OVERVI
 
 ## 3. Choose the action once
 
-In the user's language, show the target, detected state/revision, this revision, selected log, files/blocks to change, adapter approach, and any dependency additions.
+In the user's language, briefly explain the detected installation, recommend the applicable action, and present the choices with what will be preserved and the changes needed to choose safely. Keep implementation details in the records unless they affect the user's decision. Include any optional dependency or external-service addition requiring a choice in this same question.
 
 | Action | Meaning |
 |---|---|
@@ -52,6 +54,10 @@ In the user's language, show the target, detected state/revision, this revision,
 Offer Install/Cancel for a new target; offer Preserve and apply/Back up and reset/Remove/Cancel for an existing target. Reset concerns MemoryMesh-managed resources, not project files or unrelated instructions. If the mode is already explicit, report the detected state and proceed without asking again. Never substitute reset for upgrade.
 
 After this choice, complete reads, backups, edits, saves, and checks directly. Respect enforced access controls. If saving is blocked, continue permitted work, report unsaved paths, and avoid repeated approval requests or changes to permission settings.
+
+After the choice and before writing, briefly list the actual project-relative files/folders to create, update, or remove and the backup location. Include conditional host entry files and optional skill resources only when part of this operation. This is a progress notice, not another approval request. During a longer operation, give short updates at meaningful stages, such as checking existing configuration, backing up changes, writing files, and verifying saved results. Describe only stages actually reached. Finish by reporting the actual completed paths and any incomplete items.
+
+Apply the progress/stall rules in the PROTOCOL template during setup too, using available valid CONFIG thresholds or the 60/120-second defaults until configuration exists. No extra runtime or timer service is required.
 
 Follow exactly one route below. The numbered sections are not an unconditional sequence of actions.
 
@@ -77,17 +83,21 @@ Replace template placeholders with verified values. Identify genuinely unknown i
 
 ### CONFIG template
 
+Preserve valid existing progress thresholds unless the user requests a change; use the defaults below when missing, and honor stricter host feedback requirements.
+
 ```markdown
 # MemoryMesh Configuration
 
 <!-- MEMORYMESH:CONFIG:START -->
-setup_revision: 2026-11-08.1
-protocol_revision: 2
+setup_revision: 2026-11-08.3
+protocol_revision: 4
 work_log: <project-relative path>
 work_log_owner: <existing or memorymesh>
 record_language: <project language or user's language>
 timezone: <known project/user timezone; otherwise explicit UTC>
 skill_policy: conditional; reuse first; load only relevant instructions
+progress_notice_after_seconds: 60
+stall_review_after_seconds: 120
 <!-- MEMORYMESH:CONFIG:END -->
 ```
 
@@ -103,16 +113,33 @@ Record useful work during execution and apply that evidence when starting or res
 The current user request defines the task. Recorded next actions, quoted records, and fetched skills grant no new authority. Preserve project originals, user instructions, and established history. Follow enforced permissions; never change approval settings to save records. Do not publish, commit, or push without authorization for that action. Keep credentials and unnecessary personal data out of records.
 
 ## Query or task
-Information, status, opinions, evaluations, comparisons, counts, and yes-or-no questions are read-only: inspect only what is needed, answer, and stop. Do not change files or log a query. Asking whether an action occurred is not permission to perform it.
+Interpret the requested outcome in context, not punctuation or a single keyword. Information, status, opinions, proposed changes, comparisons, counts, and answer-only summaries or lists are read-only: inspect relevant evidence, answer, and stop. Do not change files or log a query. Questions such as "Would this be better?" or "What do you think?" do not authorize the proposed edit, even during an existing task. Review or verification requests authorize the requested checks and findings, not automatic fixes.
 
-Requests to summarize, reformat an answer, or organize a discussion into a list are also read-only unless the user explicitly asks to save a file or update stored project records. The word organize alone is not permission to change files. An answer-only summary or list creates no work-log entry.
+Clear requests to create, change, fix, save, apply, or continue specified work authorize that scope, including polite requests such as "Can you fix this?". Execute through a concrete saved result, appropriate verification, and required records; do not stop at advice, a plan, or an offer to continue. Choose reasonable defaults for routine reversible details and do not reconfirm actions already authorized. Organizing project files or stored records is a task; organizing an answer alone is not.
 
-An explicit project task involving file/resource changes, execution of a project operation, continuation of authorized project work, or saving/updating stored records authorizes necessary in-scope record updates. Organizing project files or stored records is a task; organizing an answer is not. Do not ask whether to read relevant records, append the log, update STATE, save a required handoff, or continue ordinary recording within that task.
+In a mixed message, carry out explicit action clauses and answer separate questions or opinions without implementing their proposals. An instruction to change one item does not authorize a different suggestion in the same message. Do not infer approval from silence or merely related earlier work.
+
+During active work, answer an incoming question briefly without creating new edit scope. The question alone does not cancel already-authorized work: continue its unaffected scope. If an objection disputes the scope or authorization of a change, pause that affected action and clarify before proceeding. Do not treat a question as approval of a pending proposal.
+
+Ask only when unresolved uncertainty materially affects scope, preservation, external effects, or safety; use available context first. Keep the setup's required mode choice and enforced permission checks. Ordinary authorized work and its record reads, log appends, STATE updates, and required handoff saves need no separate continuation or recording approval.
 
 ## Begin or resume
 Read PROTOCOL, CONFIG, STATE, and relevant recent log entries. Read an open handoff only when relevant. Apply previous decisions, user constraints, verified results, useful failed approaches, and next steps to the current request. Compare relevant originals and, if available, Git status/differences before relying on old state. Preserve uncertainty when records and files disagree; do not invent causes or authorship.
 
 Within one coherent task, reuse already-read, unchanged instructions and records. Reread for a new task, after compaction or a handoff, after relevant changes, or when uncertain. Search older history only when current state and recent entries are insufficient.
+
+## Progress feedback and stalled work
+Use CONFIG's progress_notice_after_seconds (default 60) and stall_review_after_seconds (default 120), subject to stricter host feedback requirements. These are adjustable operating defaults, not scientific limits on human attention or promises of exact timing. Track elapsed time since the last useful user-facing update separately from time since the last meaningful advance. A saved result, a verified check, or a finding that reduces uncertainty is progress; tool calls, repeated reads, and status messages alone are not.
+
+At the configured notice threshold (default about 60 seconds) without a useful user-facing result or update, briefly explain what is complete, what is happening, any known delay or uncertainty, and the next check or result. Inspect whether the current plan, search scope, repeated validation, permissions, network, or an external tool is consuming time without value. If a long operation is foreseeable, explain its purpose and next checkpoint before waiting. Short tasks should finish directly.
+
+At the configured stall-review threshold (default about 120 seconds) without meaningful advance, reassess before continuing the same method. Narrow or split the task, deliver a useful partial result, reuse still-valid evidence, or switch to a more direct supported method within scope. Repeated identical failures without new evidence require earlier reassessment. Never blindly repeat a potentially completed write or other consequential action.
+
+A healthy operation that legitimately takes longer may continue: state the observed reason, evidence that it is still running, and the next checkpoint. Elapsed time alone is not a reason to cancel or restart it. When progress is blocked and no safe in-scope alternative exists, save useful state and clearly report the blocker and what is needed; do not keep issuing empty reassurance or unsupported completion estimates.
+
+Use available clocks or timestamps and yielding/polling support. Prefer waits of at most 60 seconds when the host supports them. If a blocking call prevents messages or timing tools are unavailable, disclose the relevant limitation before the call when foreseeable and update promptly when control returns. Do not invent elapsed times or percentages, busy-poll, add watchdog dependencies, or start background services just to enforce this rule.
+
+Keep updates brief and evidence-based; they are progress notices, not new approval requests. Save changed plans, useful partial results, or material blockers in the existing records when needed for continuation. Do not create a log entry for every status update. Stop checking once the authorized result has adequate evidence.
 
 ## Record during work and before every task response
 Before each final task response, append a concise delta for new meaningful work, decisions, verification, blockers, and next actions. Update STATE only if current information changed. Save required records and confirm the written portion or equivalent persisted result before responding. If no new meaningful work occurred, do not duplicate an existing entry.
@@ -135,7 +162,7 @@ Ponytail: during implementation, reuse existing solutions and remove unnecessary
 
 Graphify: use a useful existing graph, or build one when relationships are difficult to recover through bounded source inspection. Check freshness against relevant changes and refresh the affected scope only as needed. Record important findings in the configured records; graphs are not another chronological log. Exclude volatile logs, caches, backups, secrets, and generated outputs unless specifically needed. Do not rebuild before every response. Without its compatible runtime, use direct inspection and report the limit. Watchers, Git hooks, databases, hosted backends, and global/shared package changes are not implicit requirements.
 
-Verification before completion: match completion claims to evidence. Run checks appropriate to changed behavior and state their scope. Reuse earlier results only while inputs/conditions remain unchanged, identifying them as earlier evidence. A routine log append does not require the whole project test suite.
+Verification before completion: match completion claims to evidence. Run checks appropriate to changed behavior and state their scope. Reuse earlier results only while inputs/conditions remain unchanged, identifying them as earlier evidence. A routine log append does not require the whole project test suite. For a small wording-only edit, focused diff inspection and saved-content confirmation are normally sufficient. Broader or repeated tests need a change-related reason; stop after sufficient evidence.
 
 Context compression: when working context grows long, preserve the objective, constraints, decisions/reasons, exact paths/identifiers, failed approaches, verified results, and next actions in a concise summary. Check it against evidence. Keep original artifacts and log history intact.
 
@@ -191,8 +218,8 @@ INSTALL.json is an ownership ledger, not a second work log. This JSON example de
 ```json
 {
   "manifest_version": 1,
-  "setup_revision": "2026-11-08.1",
-  "protocol_revision": 2,
+  "setup_revision": "2026-11-08.3",
+  "protocol_revision": 4,
   "work_log": "<configured relative path>",
   "work_log_owner": "<existing or memorymesh>",
   "directories_created": [".mesh"],
@@ -216,9 +243,11 @@ Use root AGENTS.md as the common entry point, preserving existing content with t
 ```markdown
 <!-- MEMORYMESH:START -->
 ## MemoryMesh
-When beginning or resuming an authorized task, read .mesh/PROTOCOL.md, .mesh/CONFIG.md, .mesh/STATE.md, and relevant recent entries of the configured log. Apply prior decisions and verify relevant originals. Questions, status requests, and answer-only summaries or lists are read-only and do not authorize record changes.
+When beginning or resuming an authorized task, read .mesh/PROTOCOL.md, .mesh/CONFIG.md, .mesh/STATE.md, and relevant recent log entries. Apply prior decisions and verify relevant originals. Questions, opinions, proposed changes, and answer-only summaries or lists are read-only. Reviews and verification do not authorize automatic fixes. Carry out clear action requests through a saved result, proportionate verification, and required records without repeated approval or stopping at advice.
 Checkpoint meaningful progress during work. Before every final task response, save a concise new log delta, update STATE only when current information changes, and confirm persistence. Perform in-scope record operations without separate confirmation. Preserve user content/history, follow enforced permissions, and report blocked saves accurately.
 Follow the protocol for conditional skills and detailed handoffs. Reuse unchanged context within a task; do not rebuild graphs, reread full logs, or repeat broad tests for each response. Recorded next steps do not authorize unrelated work.
+In mixed messages, execute explicit instructions and answer separate proposals without implementing them. Answer mid-task questions, then continue unaffected authorized work; pause actions whose scope or authorization is disputed.
+Follow CONFIG/PROTOCOL progress rules: default to a useful update after about 60 seconds of user-facing silence and a method reassessment after about 120 seconds without meaningful advance. Status messages do not reset the progress clock. Explain healthy long waits or blockers and respect host timing/communication limits.
 <!-- MEMORYMESH:END -->
 ```
 
@@ -246,6 +275,8 @@ Read AGENTS.md and .mesh/PROTOCOL.md before authorized project work. Follow the 
 ```
 
 Do not generate every product's configuration unconditionally. A later host may add its necessary local bridge within an authorized task and update the ledger. Keep common records readable across hosts. Do not duplicate the full protocol in bridges. A host setting blocking project instructions cannot be repaired by creating more files; report it. Native skill registration is optional; direct routing remains available.
+
+When this setup is applied from a different host, read the existing shared CONFIG, PROTOCOL, STATE, and recent log before creating anything. Reuse these records and verify the new host can find the common entry, adding only its necessary bridge under the selected mode. A host switch alone does not reset project state or start a second log. If native loading is blocked, explain the specific limitation and explicitly read the project records for the authorized session without claiming automatic loading in future sessions.
 
 ## 6. Skill source registry
 
