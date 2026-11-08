@@ -1,7 +1,7 @@
 # MemoryMesh Setup
 
-- Setup revision: `2026-11-08.4`
-- Protocol revision: `5`
+- Setup revision: `2026-11-08.5`
+- Protocol revision: `6`
 - Preserve real paths, names, quoted user text, and the project's record language.
 
 ## 1. Execute this file
@@ -89,8 +89,8 @@ Preserve valid existing progress thresholds and external_skill_fetch values unle
 # MemoryMesh Configuration
 
 <!-- MEMORYMESH:CONFIG:START -->
-setup_revision: 2026-11-08.4
-protocol_revision: 5
+setup_revision: 2026-11-08.5
+protocol_revision: 6
 work_log: <project-relative path>
 work_log_owner: <existing or memorymesh>
 record_language: <project language or user's language>
@@ -130,7 +130,7 @@ Read PROTOCOL, CONFIG, STATE, and relevant recent log entries. Read an open hand
 Within one coherent task, reuse already-read, unchanged instructions and records. Reread for a new task, after compaction or a handoff, after relevant changes, or when uncertain. Search older history only when current state and recent entries are insufficient.
 
 ## Progress feedback and stalled work
-Use CONFIG's progress_notice_after_seconds (default 60) and stall_review_after_seconds (default 120), subject to stricter host feedback requirements. These are adjustable operating defaults, not scientific limits on human attention or promises of exact timing. Track elapsed time since the last useful user-facing update separately from time since the last meaningful advance. A saved result, a verified check, or a finding that reduces uncertainty is progress; tool calls, repeated reads, and status messages alone are not.
+Use CONFIG's progress_notice_after_seconds (default 60) and stall_review_after_seconds (default 120), subject to stricter host feedback requirements. These are adjustable defaults, not promises of exact timing. Track elapsed time since the last useful user-facing update separately from time since the last meaningful advance. A saved result, a verified check, or a finding that reduces uncertainty is progress; tool calls, repeated reads, and status messages alone are not.
 
 At the configured notice threshold (default about 60 seconds) without a useful user-facing result or update, briefly explain what is complete, what is happening, any known delay or uncertainty, and the next check or result. Inspect whether the current plan, search scope, repeated validation, permissions, network, or an external tool is consuming time without value. If a long operation is foreseeable, explain its purpose and next checkpoint before waiting. Short tasks should finish directly.
 
@@ -219,8 +219,8 @@ INSTALL.json is an ownership ledger, not a second work log. This JSON example de
 ```json
 {
   "manifest_version": 1,
-  "setup_revision": "2026-11-08.4",
-  "protocol_revision": 5,
+  "setup_revision": "2026-11-08.5",
+  "protocol_revision": 6,
   "work_log": "<configured relative path>",
   "work_log_owner": "<existing or memorymesh>",
   "directories_created": [".mesh"],
@@ -307,7 +307,7 @@ Append this table inside CONFIG's managed block. These are reviewed references, 
 | Systematic debugging | [obra/superpowers](https://github.com/obra/superpowers/blob/22f0b463e7a5e579904dd6211a520321035526f7/skills/systematic-debugging/SKILL.md) | Root cause and useful failed-attempt records |
 | Skill creator | [anthropics/skills](https://github.com/anthropics/skills/blob/2c5958ecac7cee2b583967a2c4981d0f4a75c579/skills/skill-creator/SKILL.md) | Reusable procedures when authoring is in scope |
 
-When caching an upstream bundle, retain its license/attribution and required resources at the same revision. Do not relabel an adapted procedure as an unmodified skill. Graphify's runtime is separate from its instructions: check installed-version command support. Code parsing, document extraction, and refresh have different costs; promise no universal savings or silently selected hosted backend. Update pins only during authorized maintenance.
+When caching an upstream bundle, retain its license/attribution and required resources at the same revision. Do not relabel an adapted procedure as an unmodified skill. Graphify's runtime is separate from its instructions: check installed-version command support, and never silently select a hosted backend.
 
 ## 7. Reset, remove, or recover
 
@@ -329,13 +329,3 @@ Before the final response, verify only the checks applicable to the selected act
 - No unrelated edits, Git publication, global changes, duplicate logs, or unrequested services/hooks.
 
 Report detected state/action, installed revision, configured log, all created/changed/removed paths, any backup, actual validation, and conflicts/limits. Include adapter/skill omissions only when material. Cancel changes nothing. Give a next action only when one remains.
-
-## Compatibility references
-
-- [Codex instructions](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
-- [Codex skills](https://learn.chatgpt.com/docs/build-skills)
-- [Claude Code instructions](https://code.claude.com/docs/en/memory#agentsmd)
-- [Claude Code skills](https://code.claude.com/docs/en/skills)
-- [Antigravity rules](https://antigravity.google/docs/rules/)
-- [Antigravity skills](https://antigravity.google/docs/skills/)
-- [Agent Skills specification](https://agentskills.io/specification)
