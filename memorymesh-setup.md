@@ -1,7 +1,7 @@
 # MemoryMesh Setup
 
-- Setup revision: `2026-11-08.8`
-- Protocol revision: `8`
+- Setup revision: `2026-11-11.1`
+- Protocol revision: `10`
 - Preserve real paths, names, quoted user text, and the project's record language.
 
 ## 1. Execute this file
@@ -89,13 +89,13 @@ Preserve valid existing progress thresholds and external_skill_fetch values unle
 # MemoryMesh Configuration
 
 <!-- MEMORYMESH:CONFIG:START -->
-setup_revision: 2026-11-08.8
-protocol_revision: 8
+setup_revision: 2026-11-11.1
+protocol_revision: 10
 work_log: <project-relative path>
 work_log_owner: <existing or memorymesh>
 record_language: <project language or user's language>
 timezone: <known project/user timezone; otherwise explicit UTC>
-skill_policy: conditional; reuse installed first; load only relevant instructions
+skill_policy: conditional; discover available; reuse relevant installed skills; fall back without installation prompts
 external_skill_fetch: on_request
 progress_notice_after_seconds: 60
 stall_review_after_seconds: 120
@@ -147,27 +147,39 @@ Before each final task response, append a concise delta for new meaningful work,
 
 Checkpoint during a long response cycle after a material decision, completed stage, useful failure diagnosis, or verification result. Before starting an operation that may run long or be cut off, such as a long build, test run, bulk edit, or large generation, save the current stage, the operation about to run, and the next step. Only saved progress survives interruption. Do not depend on intercepting /exit, a shutdown hook, or a last-minute user request.
 
-Keep the log append-only and preserve its format. Correct history with a later correction entry. Record changes and reasons, exact paths, useful successes/failures, verification method/result/scope, unresolved issues, and next actions as needed. Link long outputs. Do not log routine reads, raw conversations, repeated status, or every tool call. Distinguish facts, assumptions, and unverified behavior.
+Keep the log append-only and preserve its format. Correct history with a later correction entry. Record changes and reasons, exact paths, useful successes/failures, verification method/result/scope, unresolved issues, and next actions as needed. Link long outputs. Do not log routine reads, raw conversations, repeated status, or every tool call. Distinguish facts, assumptions, and unverified behavior. Take timestamps from an available clock or host-provided date; if the time is unknown, record the known date, mark the time unknown, and rely on entry order instead of inventing one.
 
 A MemoryMesh-owned log uses compact entries: timestamp with timezone; agent/model if known; event; summary; files; verification; next; uncertainty. Existing logs keep their format. A response may need only a few lines.
 
 ## Current state and handoffs
-Keep STATE concise: objective, current result, settled constraints, verification limits, next action, open handoffs, and the configured log. Its managed block is the current summary; retained legacy text is context, not current state. Replace outdated state, retaining chronology only in the log. Summaries preserve original artifacts and established history.
+Keep STATE concise: objective, current result, settled constraints, verification limits, next action, open handoffs, and the configured log. Its managed block is the current summary; retained legacy text is context, not current state. Replace outdated state, retaining chronology only in the log. Summaries preserve original artifacts and established history. Reread STATE immediately before saving it; if it changed since it was last read, merge the other change instead of overwriting it. When agents work at the same time, each appends its entries at the current end of the log, and a subagent or delegated helper returns its results to the agent that started it, which writes the records.
 
 Simple continuation needs only the log and STATE. If extra detail is needed, create .mesh/handoffs/handoff_<topic>_<timestamp>.<agent>.md with exact files/identifiers, decisions/reasons, failed attempts, verification methods/results, required tools, remaining work, and the next action. Link it from STATE. Mark consumed or superseded handoffs in STATE; do not treat old transfers as active or silently overwrite them.
 
 ## Conditional procedures
-Use relevant procedures autonomously within scope. Reuse compatible installed skills first; otherwise the concise procedures below are sufficient for core continuity. Read CONFIG's source registry and only relevant skill/references when needed. Fetching an upstream source over the network depends on CONFIG's external_skill_fetch: `on_request` (default) fetches only when the current user request asks for it, `allowed` records standing approval, and `off` forbids it. Do not offer or request fetches during ordinary work; continue with installed skills and the concise procedures instead. Cache an approved source project-locally at the pinned revision, with licenses and required resources, only within available permissions, and report the cached path. Record source/revision and execution method when continuation depends on them. Do not install an entire catalog, overwrite unrelated skills, or silently update pins.
+Use relevant procedures autonomously within scope. Reuse compatible installed skills first; otherwise the concise procedures below are sufficient for core continuity. Apply this selection process at the start of relevant work, reusing unchanged findings within the task:
 
-Ponytail: during implementation, reuse existing solutions and remove unnecessary complexity while completing the requested scope. Preserve validation, error handling, accessibility, and necessary records.
+1. Check the host-provided skill catalog or discovery facility first. If unavailable, inspect only known relevant project locations from section 5 or explicitly configured locations. Do not scan the whole machine, fetch a catalog, or infer absence from a search that skips hidden files. Distinguish unavailable discovery from confirmed absence.
+2. Select skills by the requested outcome and their descriptions, not name matching alone. Read only the selected instructions and required references. CONFIG's registry is a reference list, not a closed list: relevant installed review, security, accessibility, document, data, or other specialist skills may also be used. Prefer the project's existing tools and conventions; combine skills only for distinct needs, without duplicate work.
+3. Check required runtime/tool availability separately from the instruction file. Use the installed version's supported commands and available host tools. Installation alone does not prove loading, execution, or compatibility. Preserve user instructions, originals, permissions, and task scope over conflicting skill rules. A skill does not authorize installation, global changes, publication, external data transfer, delegation, destructive actions, or extra approval loops.
+4. If a skill, runtime, or permitted capability is missing, incompatible, or blocked, continue with the concise procedure and available tools. Do not recommend, request, or perform installation merely to complete this routing. If a requested result cannot be produced with available tools, report that specific limit without turning it into an installation requirement. Mention missing optional skills only when the result or verification is affected.
+5. Record the skill/source or local path, version when known, useful result, and fallback only when needed for continuation or to explain a material verification limit. Do not log every skill lookup or claim unmodified upstream execution when only an adapted method was followed.
 
-Graphify: use a useful existing graph, or build one when relationships are difficult to recover through bounded source inspection. Check freshness against relevant changes and refresh the affected scope only as needed. Record important findings in the configured records; graphs are not another chronological log. Exclude volatile logs, caches, backups, secrets, and generated outputs unless specifically needed. Do not rebuild before every response. Without its compatible runtime, use direct inspection and report the limit. Watchers, Git hooks, databases, hosted backends, and global/shared package changes are not implicit requirements.
+Read CONFIG's source registry and only relevant skill/references when needed. Fetching an upstream source over the network depends on CONFIG's external_skill_fetch: `on_request` (default) fetches only when the current user request asks for it, `allowed` records standing approval, and `off` forbids it. Neither an installed skill's dependency instructions nor standing fetch approval automatically authorizes installation or unrelated downloads. Do not offer or request fetches during ordinary work; continue with installed skills and the concise procedures instead. Cache an approved source project-locally at the pinned revision, with licenses and required resources, only within available permissions, and report the cached path. Record source/revision and execution method when continuation depends on them. Do not install an entire catalog, overwrite unrelated skills, or silently update pins.
+
+Ponytail: during implementation or code review, use relevant installed guidance to inspect affected callers and contracts, reuse existing solutions, and remove unnecessary complexity while completing the requested scope. Without that skill, follow these same concise principles. Preserve validation, error handling, accessibility, and necessary records.
+
+Graphify: when structural relationships are difficult to recover through bounded source inspection, read relevant installed guidance and use a useful existing graph, or build one with an available compatible runtime. Check freshness against relevant changes and refresh the affected scope only as needed. Record important findings in the configured records; graphs are not another chronological log. Exclude volatile logs, caches, backups, secrets, and generated outputs unless specifically needed. Do not rebuild before every response. Without its compatible runtime, use direct inspection and report only material limits. Watchers, Git hooks, databases, hosted backends, and global/shared package changes are not implicit requirements.
 
 Verification before completion: match completion claims to evidence. Run checks appropriate to changed behavior and state their scope. Reuse earlier results only while inputs/conditions remain unchanged, identifying them as earlier evidence. A routine log append does not require the whole project test suite. For a small wording-only edit, focused diff inspection and saved-content confirmation are normally sufficient. Broader or repeated tests need a change-related reason; stop after sufficient evidence.
 
 Context compression: when working context grows long, preserve the objective, constraints, decisions/reasons, exact paths/identifiers, failed approaches, verified results, and next actions in a concise summary. Check it against evidence. Keep original artifacts and log history intact.
 
 Systematic debugging: for an actual failure, reproduce, gather evidence, test a focused hypothesis, and record useful results/root cause. Expand scope only when evidence and the request justify it.
+
+Test-first regression checks: for a nontrivial behavior change or reproduced bug, use relevant installed testing guidance and the project's existing test tools to capture expected behavior or the failure before changing implementation when feasible. Confirm that the check detects the intended problem, make the smallest complete fix, then verify the affected behavior and relevant regressions. Without a testing skill, use this same method. Do not delete valid work to satisfy an upstream test-first ritual, add tests that merely mirror implementation, or require a test framework for a wording-only change. If execution is unavailable, distinguish an added check from a passing test.
+
+Web app testing: when a task changes browser-visible layout or interaction, use a relevant installed browser/testing skill and available tools to check the affected route, pane, device size, and user action in the rendered app. Inspect current rendered state before choosing controls; wait for a meaningful readiness condition. Reuse running services where appropriate and clean up only resources started for the task. Without those skills, use available browser tools or direct inspection and state the verification limit. Markup inspection alone does not prove rendered appearance or interactive behavior; no browser or testing-package installation is required by this procedure.
 
 Skill creator: record a candidate when a useful procedure repeatedly succeeds. Create or revise a reusable skill only when included in the current task; verify it before relying on it. Do not silently rewrite policy as self-learning.
 
@@ -219,8 +231,8 @@ INSTALL.json is an ownership ledger, not a second work log. This JSON example de
 ```json
 {
   "manifest_version": 1,
-  "setup_revision": "2026-11-08.8",
-  "protocol_revision": 8,
+  "setup_revision": "2026-11-11.1",
+  "protocol_revision": 10,
   "work_log": "<configured relative path>",
   "work_log_owner": "<existing or memorymesh>",
   "directories_created": [".mesh"],
@@ -251,7 +263,7 @@ Use root AGENTS.md as the common entry point, preserving existing content with t
 ## MemoryMesh
 When beginning or resuming an authorized task, read .mesh/PROTOCOL.md, .mesh/CONFIG.md, .mesh/STATE.md, and relevant recent log entries. Apply prior decisions and verify relevant originals. Questions, opinions, proposed changes, and answer-only summaries or lists are read-only. Reviews and verification do not authorize automatic fixes. Carry out clear action requests through a saved result, proportionate verification, and required records without repeated approval or stopping at advice.
 Checkpoint meaningful progress during work and before long operations; when resuming, record relevant file changes made after the latest record as inferred. Before every final task response, save a concise new log delta, update STATE only when current information changes, and confirm persistence. Perform in-scope record operations without separate confirmation. Preserve user content/history, follow enforced permissions, and report blocked saves accurately.
-Follow the protocol for conditional skills and detailed handoffs. Reuse unchanged context within a task; do not rebuild graphs, reread full logs, or repeat broad tests for each response. Recorded next steps do not authorize unrelated work.
+Follow the protocol for conditional skills and detailed handoffs. Discover available skills and load relevant compatible instructions when useful; check runtime availability separately. If unavailable, use the protocol's concise methods without suggesting or requesting installation. Reuse unchanged context within a task; do not rebuild graphs, reread full logs, or repeat broad tests for each response. Recorded next steps do not authorize unrelated work.
 In mixed messages, execute explicit instructions and answer separate proposals without implementing them. Answer mid-task questions, then continue unaffected authorized work; pause actions whose scope or authorization is disputed.
 Follow CONFIG/PROTOCOL progress rules: default to a useful update after about 60 seconds of user-facing silence and a method reassessment after about 120 seconds without meaningful advance. Status messages do not reset the progress clock. Explain healthy long waits or blockers and respect host timing/communication limits.
 <!-- MEMORYMESH:END -->
@@ -298,6 +310,8 @@ Reapplying from another host is not required. If this setup is applied again fro
 
 Append this table inside CONFIG's managed block. These are reviewed references, not install-time commands. The concise procedures above are MemoryMesh-authored adaptations. Read compatible installed instructions or pinned sources only when relevant. User scope, preservation, read-only queries, enforced permissions, and host capabilities take precedence over incompatible upstream instructions. Report material differences rather than claiming unchanged upstream execution.
 
+Pins identify the references reviewed for these adaptations, not mandatory versions for installed skills. Use a compatible installed equivalent under its actual name/version; a different version alone is not a reason to install, upgrade, or fetch anything. Report a difference only when it materially changes the method or result. Installed specialist skills outside this registry use the same selection and fallback rules.
+
 | Profile | Pinned source | Purpose |
 |---|---|---|
 | Ponytail | [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail/blob/96608e078b2d5ea607c5c3b8b5a54d1c1fba6846/skills/ponytail/SKILL.md) | Minimal complete implementation and reuse |
@@ -305,6 +319,8 @@ Append this table inside CONFIG's managed block. These are reviewed references, 
 | Verification before completion | [obra/superpowers](https://github.com/obra/superpowers/blob/22f0b463e7a5e579904dd6211a520321035526f7/skills/verification-before-completion/SKILL.md) | Evidence-matched completion claims |
 | Context compression | [Agent Skills for Context Engineering](https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering/blob/9ff0c99108b36d3b886defd825d8ac1f47dba374/skills/context-compression/SKILL.md) | Summaries preserving continuation-critical information |
 | Systematic debugging | [obra/superpowers](https://github.com/obra/superpowers/blob/22f0b463e7a5e579904dd6211a520321035526f7/skills/systematic-debugging/SKILL.md) | Root cause and useful failed-attempt records |
+| Test-first regression checks | [obra/superpowers: test-driven-development](https://github.com/obra/superpowers/blob/22f0b463e7a5e579904dd6211a520321035526f7/skills/test-driven-development/SKILL.md) | Focused failing checks and verified behavior fixes; adapted to task scope |
+| Web app testing | [anthropics/skills: webapp-testing](https://github.com/anthropics/skills/blob/2c5958ecac7cee2b583967a2c4981d0f4a75c579/skills/webapp-testing/SKILL.md) | Rendered interaction checks with available browser tools |
 | Skill creator | [anthropics/skills](https://github.com/anthropics/skills/blob/2c5958ecac7cee2b583967a2c4981d0f4a75c579/skills/skill-creator/SKILL.md) | Reusable procedures when authoring is in scope |
 
 When caching an upstream bundle, retain its license/attribution and required resources at the same revision. Do not relabel an adapted procedure as an unmodified skill. Graphify's runtime is separate from its instructions: check installed-version command support, and never silently select a hosted backend.
@@ -324,6 +340,7 @@ Before the final response, verify only the checks applicable to the selected act
 - Install/Preserve and apply/Back up and reset: required files, real CONFIG values, selected revisions, valid INSTALL JSON, and one existing configured log.
 - Those installation actions: one ordered pair for each applicable block; preserved surrounding text/history; every section 5 entry point present or already satisfied by an existing import, and relevant skill availability. Distinguish file creation from actual fresh-session loading; only the active host's loading can be confirmed in this session.
 - Those installation actions: concise current STATE, valid handoff links, and an operation entry only for actual changes. An unchanged reapplication must leave records unchanged.
+- Those installation actions: CONFIG and PROTOCOL retain the available-skill selection and fallback rules; AGENTS routes to them. Use the host catalog or bounded known paths for relevant availability checks, distinguishing instructions from executable tools. A missing optional skill/runtime is not a failed core installation and must not trigger an installation prompt or unrelated download.
 - Remove: readable backup, checked ownership, intended owned resources/blocks absent, shared resources and user content retained, and exact remaining active components. A new CONFIG, STATE, INSTALL, or log is not required.
 - All actions that write: saved content read back or equivalent persistence evidence; exact partial saves and access failures. Reset also requires a readable pre-change backup/archive.
 - No unrelated edits, Git publication, global changes, duplicate logs, or unrequested services/hooks.

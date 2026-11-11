@@ -64,6 +64,8 @@ After installation, request work as usual. Whichever agent applied the setup, yo
 - It saves meaningful progress during work and records new information before responding with task results. You do not need to repeat instructions to save records.
 - An existing work log is reused. Otherwise, records are saved to `.mesh/work.log`. You can check the current status in `.mesh/STATE.md`.
 
+When useful skills such as Ponytail or Graphify are already installed, the agent reads and applies relevant guidance. Other installed skills may also be used when relevant to the task. If a skill or its runtime is unavailable, work continues with MemoryMesh's basic procedures, without recommending or requesting installation. Regression tests and rendered web checks are performed only when the task calls for them, and the results identify anything that could not be verified with actual tools.
+
 Requests for information, opinions, or answer organization do not change files. A clear request to change files or carry out work authorizes that task and its necessary record updates. When instructions and questions are mixed, only the instructed actions are carried out.
 
 ## Notes and limitations
