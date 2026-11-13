@@ -1,7 +1,7 @@
 # MemoryMesh Setup
 
-- Setup revision: `2026-11-11.1`
-- Protocol revision: `10`
+- Setup revision: `2026-11-13.1`
+- Protocol revision: `11`
 - Preserve real paths, names, quoted user text, and the project's record language.
 
 ## 1. Execute this file
@@ -89,8 +89,8 @@ Preserve valid existing progress thresholds and external_skill_fetch values unle
 # MemoryMesh Configuration
 
 <!-- MEMORYMESH:CONFIG:START -->
-setup_revision: 2026-11-11.1
-protocol_revision: 10
+setup_revision: 2026-11-13.1
+protocol_revision: 11
 work_log: <project-relative path>
 work_log_owner: <existing or memorymesh>
 record_language: <project language or user's language>
@@ -175,6 +175,8 @@ Verification before completion: match completion claims to evidence. Run checks 
 
 Context compression: when working context grows long, preserve the objective, constraints, decisions/reasons, exact paths/identifiers, failed approaches, verified results, and next actions in a concise summary. Check it against evidence. Keep original artifacts and log history intact.
 
+Prompt caching: keep reusable instructions and reference context stable in content and order; avoid unnecessary rewrites. Keep timestamps, STATE, and recent work-log excerpts separate from stable instructions. When the host allows control over input assembly, place stable context first and changing state and requests afterward. Required record updates, freshness checks, and context compression take priority over cache reuse. Skipped file reads, local source caches, and persistent handoff records do not prove a provider prompt-cache hit or transfer that cache between hosts. Claim cache hits or cost/latency savings only when supported by host/provider usage evidence; otherwise continue normally without promising savings or requiring cache settings, services, or dependencies. See [Anthropic prompt-caching guidance](https://platform.claude.com/docs/en/build-with-claude/prompt-caching).
+
 Systematic debugging: for an actual failure, reproduce, gather evidence, test a focused hypothesis, and record useful results/root cause. Expand scope only when evidence and the request justify it.
 
 Test-first regression checks: for a nontrivial behavior change or reproduced bug, use relevant installed testing guidance and the project's existing test tools to capture expected behavior or the failure before changing implementation when feasible. Confirm that the check detects the intended problem, make the smallest complete fix, then verify the affected behavior and relevant regressions. Without a testing skill, use this same method. Do not delete valid work to satisfy an upstream test-first ritual, add tests that merely mirror implementation, or require a test framework for a wording-only change. If execution is unavailable, distinguish an added check from a passing test.
@@ -231,8 +233,8 @@ INSTALL.json is an ownership ledger, not a second work log. This JSON example de
 ```json
 {
   "manifest_version": 1,
-  "setup_revision": "2026-11-11.1",
-  "protocol_revision": 10,
+  "setup_revision": "2026-11-13.1",
+  "protocol_revision": 11,
   "work_log": "<configured relative path>",
   "work_log_owner": "<existing or memorymesh>",
   "directories_created": [".mesh"],
