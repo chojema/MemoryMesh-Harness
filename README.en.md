@@ -33,7 +33,7 @@ Use the same request when starting for the first time or changing an existing co
 
 Reset and removal preserve project materials, unrelated parts of user instructions, existing external work logs, and shared tools. Items with uncertain ownership are retained and reported.
 
-After replacing the setup file with a new copy, use the same request to apply it again.
+After replacing the setup file with a new copy, use the same request to apply it again. Downloading or replacing the file alone does not update instructions in an existing project. Choose “Preserve and apply” to apply the new instructions while keeping existing records.
 
 ## Files created or updated
 
@@ -66,10 +66,15 @@ After installation, request work as usual. Whichever agent applied the setup, yo
 
 When useful skills such as Ponytail or Graphify are already installed, the agent reads and applies relevant guidance. Other installed skills may also be used when relevant to the task. If a skill or its runtime is unavailable, work continues with MemoryMesh's basic procedures, without recommending or requesting installation. Regression tests and rendered web checks are performed only when the task calls for them, and the results identify anything that could not be verified with actual tools.
 
-Requests for information, opinions, or answer organization do not change files. A clear request to change files or carry out work authorizes that task and its necessary record updates. When instructions and questions are mixed, only the instructed actions are carried out.
+Requests for information, opinions, improvement assessments, or answer organization authorize inspection and a response only. Findings are not applied automatically, and versions, records, and publications are not changed. A clear request to change files or carry out work authorizes that task and its necessary record updates. When instructions and questions are mixed, only the instructed actions are carried out.
+
+Immediately before changing files or taking external action, the agent checks that the latest request authorizes that action on that target. A clarification such as “review, do not edit” takes precedence over an earlier interpretation. This is not a requirement to ask again for already-authorized work. The agent must not substitute global skills or external repositories for the requested project. If it discovers an unauthorized change, it stops the affected work and reports it, restoring only its own unauthorized changes when the original state and any intervening edits can be verified.
+
+Before implementing requested work, the agent establishes completion criteria and an appropriate verification method. For complex work, it briefly describes the steps and verification checkpoints and reuses existing plans. Simple tasks need no separate plan file or additional approval step. Criteria and plans needed for continuation are kept in the existing records.
 
 ## Notes and limitations
 
+- MemoryMesh provides written instructions for agents. Its authorization checks do not technically enforce compliance or guarantee that violations can never occur.
 - If a session ends abruptly, decisions or intentions that existed only in the conversation may not carry over. Work results left in files are checked and added to the records when the next task starts.
 - Automatic recording and resumption may not work if an agent's settings prevent it from reading project instructions or saving files.
 - While a tool is running, the agent may be unable to send progress updates until control returns.

@@ -1,7 +1,7 @@
 # MemoryMesh Setup
 
-- Setup revision: `2026-11-13.1`
-- Protocol revision: `11`
+- Setup revision: `2026-11-15.1`
+- Protocol revision: `12`
 - Preserve real paths, names, quoted user text, and the project's record language.
 
 ## 1. Execute this file
@@ -89,8 +89,8 @@ Preserve valid existing progress thresholds and external_skill_fetch values unle
 # MemoryMesh Configuration
 
 <!-- MEMORYMESH:CONFIG:START -->
-setup_revision: 2026-11-13.1
-protocol_revision: 11
+setup_revision: 2026-11-15.1
+protocol_revision: 12
 work_log: <project-relative path>
 work_log_owner: <existing or memorymesh>
 record_language: <project language or user's language>
@@ -124,8 +124,17 @@ During active work, answer an incoming question briefly without creating new edi
 
 Ask only when unresolved uncertainty materially affects scope, preservation, external effects, or safety; use available context first. Keep the setup's required mode choice and enforced permission checks. Ordinary authorized work and its record reads, log appends, STATE updates, and required handoff saves need no separate continuation or recording approval.
 
+### Mandatory check before side effects
+Immediately before a write or other side effect, verify that the applicable user instruction authorizes this action on this target under the latest scope clarification. Check the requested outcome, target project/files, applicable constraints, and whether a later message has limited or withdrawn that authorization. This check is required even after planning or obtaining earlier approval; it is an internal check, not a new approval prompt for already-authorized work.
+
+For a review, opinion, or improvement assessment, inspect and report only: do not implement recommendations, update versions, append records, or publish. Words such as "improvement" or "fix" inside a discussion of possible changes are not themselves execution requests. A clarification such as "I mean assess whether improvement is needed" supersedes an earlier interpretation permitting edits. If an action or target cannot be tied to valid authorization, withhold that side effect; continue permitted read-only work and ask only if execution is requested but its scope remains materially ambiguous. Never substitute a global/third-party skill or its upstream repository for the current project's requested artifact.
+
+If a scope violation is discovered, stop affected side effects, disclose the exact changes, and restore only your unauthorized changes when the pre-change state and absence of intervening edits are verified. Preserve other work and report any recovery uncertainty. Do not treat failure to follow an existing instruction as evidence that a new rule is needed, or silently expand the task to rewrite instructions. These written checks guide the agent; they do not provide a technical guarantee of compliance or authorize installing enforcement hooks or changing host permissions.
+
 ## Begin or resume
 Read PROTOCOL, CONFIG, STATE, and relevant recent log entries. Read an open handoff only when relevant. Apply previous decisions, user constraints, verified results, useful failed approaches, and next steps to the current request. Compare relevant originals and, if available, Git status/differences before relying on old state. Preserve uncertainty when records and files disagree; do not invent causes or authorship. When beginning an authorized task, if files relevant to the recorded work or the current request changed after the latest record, for example because a session ended before saving, append one RECOVERED entry listing the observed changes, marked as inferred from files with the author unknown unless evidence shows otherwise, and update STATE if the current status changed. Do not do this for a read-only query.
+
+Before implementing authorized work, derive observable completion criteria and a proportionate verification method from the request and actual project state. Resolve only ambiguities that materially affect the result or scope. For complex work, briefly state the execution steps and verification checkpoints, reusing an existing plan when available. Simple work needs no separate plan file or approval round. Preserve useful criteria and plans in the existing records when needed for continuation; do not create duplicate records.
 
 Within one coherent task, reuse already-read, unchanged instructions and records. Reread for a new task, after compaction or a handoff, after relevant changes, or when uncertain. Search older history only when current state and recent entries are insufficient.
 
@@ -233,8 +242,8 @@ INSTALL.json is an ownership ledger, not a second work log. This JSON example de
 ```json
 {
   "manifest_version": 1,
-  "setup_revision": "2026-11-13.1",
-  "protocol_revision": 11,
+  "setup_revision": "2026-11-15.1",
+  "protocol_revision": 12,
   "work_log": "<configured relative path>",
   "work_log_owner": "<existing or memorymesh>",
   "directories_created": [".mesh"],
